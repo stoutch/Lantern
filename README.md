@@ -23,7 +23,8 @@ dictionaries of the form {lat: , long: } that describe the
 final and initial position of the routes respectively
 
 The query have the form (for now lets hardcode the userid to 1):
-http://<server address>:23436/route?userid=1&start={lat:<start latitute>,lng:<start longitude>}&dest={lat:<destination latitute>,lng:<destination longitude>}
+http://<server address>:23436/route?userid=1&start={"lat":<start latitute>,lng:<start longitude>}&dest={"lat":<destination latitute>,"lng":<destination longitude>}
+For this query everything is a string, so in the dictionaries include the quotation marks "" arount both the lat and long, aka you need to serialize the json representation to fit the previous query.
 
 A way to store it in the program would be:
 {"userid":"number" ,"dest": {"lat":"number" ,lng:"number" }, start: {lat:"number","lng":"number"}}
