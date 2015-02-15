@@ -1,5 +1,5 @@
 # MAS
-## Database Interface
+## Server Interface
 
 For each data query we are going to use json structures. Probably
 later we are going to add to each of this structures new 
