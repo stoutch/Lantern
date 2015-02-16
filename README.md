@@ -19,6 +19,12 @@ keywords: latitude and longitude.
 The query have the form
 http://\<server address\>:23436/heatmap?lat=\<latitude\>&lng=\<longitude\>
 
+I think we need to use two different heatmaps with different gradient colors:
+
+1. Positive warm heatmap, it shows what places are good.
+
+2. Negative cold heatmap, it shows what places are bad.
+
 ### Routes
 Each query to the server for routes is going to have the following keywords: dest and star.
 estination and starting point are both
