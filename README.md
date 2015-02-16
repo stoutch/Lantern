@@ -7,7 +7,7 @@ spaces for the authentication, have that in mind.
 
 All the next queries are going to be embedded into another json with the next structure
 
-{"success":<True or False>,"response":<actual response>}
+{"success":\<True or False\>,"response":\<actual response\>}
 
 ### Heatmap
 The heatmap response from the server is going to be an 
