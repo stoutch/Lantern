@@ -44,3 +44,10 @@ The response to the query is going to be an array of dictionaries.
 Each dictionary has two keywords: name and waypoints. As follows
 
 [{"name":"String","waypoints":[{"lat":"number","lng":"number"},{"lat":"number","lng":"number"},....]},...,{"name":"String","waypoints":[{"lat":"number","lng":"number"},{"lat":"number","lng":"number"},....]}]
+
+## References 
+
+Routes API:
+https://developers.google.com/maps/documentation/directions/
+
+We need to define alternatives=true and mode=walking to any query that do.
