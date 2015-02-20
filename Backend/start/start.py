@@ -4,6 +4,7 @@
 
 import sys
 import argparse
+import config
 
 sys.path.append('../')
 
@@ -16,8 +17,8 @@ args = parser.parse_args()
 conf = config.envs[args.env]
 
 def start_server():
-    import start
-    start(conf)
+    import server
+    server.start(conf)
 
 def stop_server():
     from httplib import HTTPConnection

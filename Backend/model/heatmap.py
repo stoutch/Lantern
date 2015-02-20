@@ -4,10 +4,9 @@ from tornado.gen import Return, coroutine
 class _Heatmap:
     '''
     ***************************************************************************
-                                HEATMAP
+    *                        HEATMAP
     ***************************************************************************
     '''
-
     @coroutine
     def add_point_to_heatmap(self,idUser,latitude,longitude):
         '''
@@ -23,7 +22,7 @@ class _Heatmap:
         result = yield future
         raise Return(result)
 
-     @coroutine
+    @coroutine
     def get_heatmap(self,latitude,longitude,radius):
         '''
         latitude: number that contains the latitude of the center point of the heatmap
