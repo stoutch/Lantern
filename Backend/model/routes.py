@@ -1,5 +1,6 @@
 from bson.objectid import ObjectId
 from tornado.gen import Return, coroutine
+from urllib2 import urlopen
 
 class _Route:
     '''
@@ -24,7 +25,7 @@ class _Route:
     Google encoded polyline algorithm.
     '''
      
-    def encode_coords(coords):
+    def encode_coords(self,coords):
         '''Encodes a polyline using Google's polyline algorithm
         
         See http://code.google.com/apis/maps/documentation/polylinealgorithm.html 
@@ -55,7 +56,7 @@ class _Route:
         
         return ''.join(c for r in result for c in r)
     
-    def _split_into_chunks(value):
+    def _split_into_chunks(self,value):
         while value >= 32: #2^5, while there are at least 5 bits
             
             # first & with 2^5-1, zeros out all the bits other than the first five
@@ -64,7 +65,7 @@ class _Route:
             value >>= 5
         yield value
      
-    def _encode_value(value):
+    def _encode_value(self,value):
         # Step 2 & 4
         value = ~(value << 1) if value < 0 else (value << 1)
         
@@ -74,7 +75,7 @@ class _Route:
         # Step 9-10
         return (chr(chunk + 63) for chunk in chunks)
      
-    def decode(point_str):
+    def decode(self,point_str):
         '''Decodes a polyline that has been encoded using Google's algorithm
         http://code.google.com/apis/maps/documentation/polylinealgorithm.html
         
@@ -138,3 +139,32 @@ class _Route:
             points.append((round(prev_x, 6), round(prev_y, 6)))
         
         return points            
+
+    def obtain_routes(self,origin,destination,mode="walking",alternatives=True):
+        '''
+        * @origin: dictionary with keys 'lat' and 'lng' that define the origin.
+        * @destination: dictionary with keys 'lat' and 'lng' that define the destination.
+        * @mode: string mode of the query. E.g. walking, etc.
+        * @alternatives: boolean, true or false, to obtain more than one route (if true)
+        '''
+        http_dir = "https://maps.googleapis.com/maps/api/directions/json?"
+        http_dir +=("origin="+str(origin["lat"])+","+str(origin["lng"]))
+        http_dir +=("&destination="+str(destination["lat"])+","+str(destination["lng"]))
+        if mode is not None:
+            http_dir += "&mode="+mode
+        if alternatives:
+            http_dir += "&alternatives=true"
+        else:
+            http_dir += "&alternatives=false"
+        routes = eval(urlopen(http_dir).read())
+        return routes
+
+    def obtain_point_in_routes(self,routes):
+        '''
+        This function returns an array of arrays with the points that compose each route.
+        @routes: is the json that is formed from the routes returned by the Google Maps API query.
+        '''
+        output=[]
+        for route in routes["routes"]:
+            output.append(decode(route["overview_polyline"]["points"]))
+        return output
