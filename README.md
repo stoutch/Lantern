@@ -61,4 +61,7 @@ The app debug key is AA:D7:94:2A:83:86:91:78:29:3A:B0:1E:C2:A0:60:18:0D:DB:3C:F8
 
 I used this key to generate an API key for the Maps API from the Google APIs Console. If the app key(if we use the release key) and package name change, we need to regenerate the API key. 
 
-At present, there are 2 activities - the first is the login screen and second the initial map. (I've just put a login button on the first screen - we can start the demo from the next one). The second screen just displays a map for now.
+At present, there are 3 activities - 
+1. Start - The first is the login screen - I've just put a login button (which directs to the next screen) on the first screen - we can start the demo from the next one
+2. InitialMap - The second screen displays a map for now. There's a text field and search button at the bottom. At present, clicking either will just take you to the next screen.
+3. Input - Has a text field and search button for entering destination.

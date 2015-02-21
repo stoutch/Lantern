@@ -1,36 +1,24 @@
 package com.example.deept_000.masproject;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.google.android.gms.maps.*;
-import android.widget.Toast;
-import android.util.Log;
-//import android.content.Intent;
-
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 
-public class InitialMapActivity extends ActionBarActivity {
-
-    GoogleMap googleMap;
+public class InputActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_initial_map);
-
+        setContentView(R.layout.activity_input);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_initial_map, menu);
+        getMenuInflater().inflate(R.menu.menu_input, menu);
         return true;
     }
 
@@ -47,10 +35,5 @@ public class InitialMapActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void inputDestination(View view) {
-        Intent intent = new Intent(this, InputActivity.class);
-        startActivity(intent);
     }
 }
