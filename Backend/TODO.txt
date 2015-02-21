@@ -16,6 +16,7 @@
 7. Add to the configuration file the APIKey
 8. Change the edge length of the route boxer to be a variable in the config file. Change the value al
 9. Using the bound routes, obtain the points that are within of those rectangles, using aggregation.
+10. Read todo in line 36 of routes.py
 
 Read 
 Rest Recommendations

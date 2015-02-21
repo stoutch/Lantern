@@ -12,22 +12,38 @@ class _Route:
     '''
 
     @coroutine
-    def get_route(self,idUser,destination_point,starting_point):
+    def get_route(self,idUser,destination_point,starting_point,total=50):
         '''
         id_user: id of the user trying to get the route.
         destination_point: {lat:,long:} of the geographical position of the final destination.
         starting_point: {lat:,long:} of the geographical position of the starting point
         '''
         result = {}
-        #TODO: Everything
         result = self.obtain_routes(starting_point,destination_point,"walking",True)
+        #Points obtained from the polyline of the routes
         points = self.obtain_point_in_routes(result)
-        print points
-        result['points']=points
-        result['heatmap']=[]
+        bounding_boxes=[]
+        #Obtain the bounding boxes of the routes
         for index in range(len(result["routes"])):
-            print result['routes'][index]['bounds']
-            result['heatmap'].append(self.obtain_heatmap(points[index],result['routes'][index]['bounds']))
+            bounding_boxes.append(self.obtain_heatmap(points[index],result['routes'][index]['bounds']))
+        result['heatmaps'] = []
+        #Obtain all the points in the heatmaps that are inside of this bounding boxes
+        for bounding_box in bounding_boxes:
+            coordinates=[]
+            for rectangle in bounding_box:
+                box = [[]]
+                #Create a rectangle in the multipolygon, we need 5 positions, first and last position is the same
+                box[0].append([rectangle['ul']['lng'],rectangle['ul']['lat']])
+                box[0].append([rectangle['lr']['lng'],rectangle['ul']['lat']])
+                box[0].append([rectangle['lr']['lng'],rectangle['lr']['lat']])
+                box[0].append([rectangle['ul']['lng'],rectangle['lr']['lat']])
+                box[0].append([rectangle['ul']['lng'],rectangle['ul']['lat']])                
+                coordinates.append(box)
+            #Create the dictionary with the responses for the query of the multipolygon
+            new_dict = {}
+            new_dict['positive'] = yield self.db.positive_heatmap.find({'loc': { '$geoWithin' : { '$geometry' : {"type":"MultiPolygon","coordinates":coordinates}}}},{"loc.coordinates":1,"_id":0}).to_list(length=int(total))
+            new_dict['negative'] = yield self.db.positive_heatmap.find({'loc': { '$geoWithin' : { '$geometry' : {"type":"MultiPolygon","coordinates":coordinates}}}},{"loc.coordinates":1,"_id":0}   ).to_list(length=int(total))
+            result['heatmaps'].append(new_dict)
         raise Return(result)        
 
     '''Provides utility functions for encoding and decoding linestrings using the 
