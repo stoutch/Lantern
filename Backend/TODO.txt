@@ -1,0 +1,31 @@
+1. Define the structure of the collections.
+ - /heatmaps/positive
+ - /heatmaps/negative
+ - /routes
+ - /users
+2. Integrate the database with the server.
+ - Finish handlers.
+3. Fix servers problems
+ - HATEOAS Include links about the possible actions
+ - Add status code.
+4. Learn how to do the queries for the positions given the routes using aggregation.
+5. Add info about some places:
+33.781777, -84.395426 Tenth and home
+33.777229, -84.396187 Klauss 
+6. Use postman to try everything
+7. Add to the configuration file the APIKey
+8. Change the edge length of the route boxer to be a variable in the config file. Change the value al
+9. Using the bound routes, obtain the points that are within of those rectangles, using aggregation.
+
+Read 
+Rest Recommendations
+http://www.restapitutorial.com/lessons/restquicktips.html
+Geospatial System examples
+http://tugdualgrall.blogspot.com/2014/08/introduction-to-mongodb-geospatial.html
+
+Example Queries
+http://localhost:23436/heatmaps/negative?lat=32.725371&lng=-117.160721&radius=2500&total=3
+http://localhost:23436/heatmaps/posite?lat=32.725371&lng= -117.160721&radius=2500&total=3
+
+Options to google maps
+http://open.mapquestapi.com

@@ -21,10 +21,10 @@ def start(conf):
     port = conf.tornado_port
 
     application = tornado.web.Application([
-    (r"/user",User, ),
+    (r"/users",User, ),
     (r"/login", Login, ),
-    (r"/heatmap", Heatmap, ),
-    (r"/route", Route, )
+    (r"/heatmaps/([a-z]+)", Heatmap),
+    (r"/routes", Route, )
     ],
     model=Model(db),
     cookie_secret=conf.secret,

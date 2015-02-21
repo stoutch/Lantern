@@ -12,7 +12,7 @@ class BaseHandler(tornado.web.RequestHandler):
     SUPPORTED_METHODS='GET'
 
     def set_default_headers(self):
-        self.set_header('Access-Control-Allow-Method', ",".join(self.SUPPORTED_METHODS))
+        self.set_header('Access-Control-Allow-Methods', ",".join(self.SUPPORTED_METHODS))
         self.set_header('Access-Control-Allow-Headers', 'x-requested-with, session, Content-Type')
         self.set_header('Access-Control-Allow-Origin', '*')
         self.set_header('Access-Control-Allow-Credentials', 'false')

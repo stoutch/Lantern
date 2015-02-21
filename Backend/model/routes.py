@@ -1,6 +1,8 @@
 from bson.objectid import ObjectId
 from tornado.gen import Return, coroutine
 from urllib2 import urlopen
+import boxer
+from geoutils import *
 
 class _Route:
     '''
@@ -18,7 +20,14 @@ class _Route:
         '''
         result = {}
         #TODO: Everything
-        result = yield self.db.route.find({'brand_id':ObjectId(brand_id)},filters).to_list()
+        result = self.obtain_routes(starting_point,destination_point,"walking",True)
+        points = self.obtain_point_in_routes(result)
+        print points
+        result['points']=points
+        result['heatmap']=[]
+        for index in range(len(result["routes"])):
+            print result['routes'][index]['bounds']
+            result['heatmap'].append(self.obtain_heatmap(points[index],result['routes'][index]['bounds']))
         raise Return(result)        
 
     '''Provides utility functions for encoding and decoding linestrings using the 
@@ -166,5 +175,23 @@ class _Route:
         '''
         output=[]
         for route in routes["routes"]:
-            output.append(decode(route["overview_polyline"]["points"]))
+            output.append(self.decode(route["overview_polyline"]["points"]))
         return output
+
+    def obtain_heatmap(self,points,boundingBox):
+        boundingBoxDict = {"ul":{"lat": boundingBox["northeast"]["lat"],"lng":boundingBox["southwest"]["lng"]},"lr":{"lat": boundingBox["southwest"]["lat"],"lng":boundingBox["northeast"]["lng"]}}
+        ulDict = boundingBoxDict['ul']
+        lrDict = boundingBoxDict['lr']
+        upperLeft = coordinate(ulDict['lat'], ulDict['lng'])
+        lowerRight = coordinate(lrDict['lat'], lrDict['lng'])
+        shapePointsDict = points
+        routeCoords = []
+        for obj in shapePointsDict:
+            coord = coordinate(obj[1], obj[0])
+            routeCoords.append(coord)
+        rb = boxer.RouteBoxer(routeCoords, upperLeft, lowerRight)
+        rb.buildGrid()
+        rb.mergeIntersectingCells()
+        boxes = rb.boxes()       
+        boxCoords = rb.boxCoords()
+        return boxCoords

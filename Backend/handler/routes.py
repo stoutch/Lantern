@@ -4,9 +4,9 @@ from bson import json_util
 import tornado.web
 
 class Route(BaseHandler):
-
+    SUPPORTED_METHODS='GET'
 #TODO: User should be logged
-    @tornado.web.authenticated
+#    @tornado.web.authenticated
     @tornado.gen.coroutine
     def get(self):
 #        idUser = self.current_user['_id']
