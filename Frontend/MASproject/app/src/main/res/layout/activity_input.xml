@@ -4,7 +4,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.example.deept_000.masproject.InputActivity">
+    tools:context="com.example.deept_000.masproject.InputActivity"
+    android:background="#ff8482a7">
 
     <EditText
         android:layout_width="wrap_content"
@@ -29,8 +30,9 @@
             android:background="#ffffffff"
             android:autoText="false"
             android:hint="Enter Destination"
-            android:textColorHint="#ffb7b7b7"
-            android:singleLine="true" />
+            android:textColorHint="#ff909090"
+            android:singleLine="true"
+            android:textColor="#ff616161" />
 
         <ImageButton
             android:layout_width="60dp"
