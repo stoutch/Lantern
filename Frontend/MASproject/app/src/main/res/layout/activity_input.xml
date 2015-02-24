@@ -18,7 +18,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="280dp"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:layout_alignTop="@+id/editText2"
         android:layout_centerHorizontal="true">
 
@@ -35,13 +35,14 @@
             android:textColor="#ff616161" />
 
         <ImageButton
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:id="@+id/imageButton2"
             android:layout_weight="1"
             android:adjustViewBounds="true"
+            android:src="@drawable/search_button"
             android:scaleType="fitCenter"
-            android:src="@drawable/search_icon"
+            android:padding="10dp"
             android:background="#ffffffff" />
 
     </LinearLayout>
