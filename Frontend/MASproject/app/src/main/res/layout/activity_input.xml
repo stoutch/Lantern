@@ -7,26 +7,21 @@
     tools:context="com.example.deept_000.masproject.InputActivity"
     android:background="#ff8482a7">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/editText2"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="57dp" />
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="280dp"
+        android:layout_width="300dp"
         android:layout_height="50dp"
-        android:layout_alignTop="@+id/editText2"
-        android:layout_centerHorizontal="true">
+        android:layout_gravity="center_horizontal|top"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp">
 
         <EditText
-            android:layout_width="220dp"
+            android:layout_width="250dp"
             android:layout_height="match_parent"
             android:id="@+id/editText3"
             android:layout_weight="1"
+            android:gravity="center"
             android:background="#ffffffff"
             android:autoText="false"
             android:hint="Enter Destination"
