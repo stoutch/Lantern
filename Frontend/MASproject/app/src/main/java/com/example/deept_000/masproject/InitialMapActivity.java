@@ -13,6 +13,12 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 
 public class InitialMapActivity extends ActionBarActivity {
@@ -23,9 +29,14 @@ public class InitialMapActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_initial_map);
-
+        setUpMapIfNeeded();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setUpMapIfNeeded();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -47,6 +58,70 @@ public class InitialMapActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setUpMapIfNeeded() {
+        // Do a null check to confirm that we have not already instantiated the map.
+        try {
+            if (googleMap == null) {
+                // Try to obtain the map from the SupportMapFragment.
+                googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+                // Check if we were successful in obtaining the map.
+                if (googleMap != null) {
+                    LatLng tech = new LatLng(33.775635, -84.396444);
+                    googleMap.setMyLocationEnabled(true);
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 15));
+                    addHeatMap();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        if (googleMap == null) {
+            // Try to obtain the map from the SupportMapFragment.
+            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+            // Check if we were successful in obtaining the map.
+            if (googleMap != null) {
+                addHeatMap();
+            }
+        }
+    }
+
+    private void addHeatMap(){
+        ArrayList<LatLng> list = new ArrayList<LatLng>();
+        double minLat = 33.775238;
+        double minLong = -84.396663;
+        double maxLat = 33.776972;
+        double maxLong = -84.396744;
+        double randLat, randLong;
+        Random rand = new Random();
+        for (int i = 0; i < 15; i++){
+            randLat = rand.nextDouble()*(maxLat-minLat) + minLat;
+            randLong = rand.nextDouble()*(maxLong-minLong) + minLong;
+            list.add(new LatLng(randLat, randLong));
+        }
+
+        minLat = 33.774016;
+        minLong = -84.398498;
+        maxLat = 33.773949;
+        maxLong = -84.394920;
+        for (int i = 0; i < 15; i++){
+            randLat = rand.nextDouble()*(maxLat-minLat) + minLat;
+            randLong = rand.nextDouble()*(maxLong-minLong) + minLong;
+            list.add(new LatLng(randLat, randLong));
+        }
+
+        minLat = 33.774029;
+        minLong = -84.397876;
+        maxLat = 33.777775;
+        maxLong = -84.397811;
+        for (int i = 0; i < 15; i++){
+            randLat = rand.nextDouble()*(maxLat-minLat) + minLat;
+            randLong = rand.nextDouble()*(maxLong-minLong) + minLong;
+            list.add(new LatLng(randLat, randLong));
+        }
+        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().data(list).radius(15).opacity(.5).build();
+        TileOverlay overlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
 
     public void inputDestination(View view) {
