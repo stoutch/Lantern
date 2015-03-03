@@ -38,7 +38,9 @@
             android:src="@drawable/search_button"
             android:scaleType="fitCenter"
             android:padding="10dp"
-            android:background="#ffffffff" />
+            android:background="#ffffffff"
+            android:onClick="sendMessage"
+            />
 
     </LinearLayout>
 </RelativeLayout>

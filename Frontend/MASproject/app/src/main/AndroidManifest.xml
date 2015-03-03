@@ -43,6 +43,10 @@
             android:name=".InputActivity"
             android:label="@string/title_activity_input" >
         </activity>
+        <activity
+            android:name=".ProcessMessageActivity"
+            android:label="@string/title_activity_process_message" >
+        </activity>
     </application>
 
 </manifest>

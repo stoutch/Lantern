@@ -8,5 +8,6 @@
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_initial_map">InitialMapActivity</string>
     <string name="title_activity_input">InputActivity</string>
+    <string name="title_activity_process_message">ProcessMessageActivity</string>
 
 </resources>

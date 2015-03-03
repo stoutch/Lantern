@@ -1,12 +1,16 @@
 package com.example.deept_000.masproject;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
 
 public class InputActivity extends ActionBarActivity {
+    public final static String EXTRA_MESSAGE = "com.example.deept_000.MESSAGE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,5 +39,13 @@ public class InputActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void sendMessage(View view){
+        Intent intent = new Intent(this, ProcessMessageActivity.class);
+        EditText editText = (EditText) findViewById(R.id.editText3);
+        String message = editText.getText().toString();
+        intent.putExtra(EXTRA_MESSAGE, message);
+        startActivity(intent);
     }
 }
