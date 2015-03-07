@@ -1,4 +1,10 @@
 # MAS
+## Server queries
+
+http://173.236.254.243:8080/routes?dest={"lat":33.781777, "lng":-84.395426}&start={"lat":33.777229,"lng": -84.396187}
+http://173.236.254.243:8080/heatmaps/negative?lat=32.725371&lng= -117.160721&radius=2500&total=2
+http://173.236.254.243:8080/heatmaps/positive?lat=32.725371&lng= -117.160721&radius=2500&total=2
+
 ## Server Interface
 
 For each data query we are going to use json structures. Probably
