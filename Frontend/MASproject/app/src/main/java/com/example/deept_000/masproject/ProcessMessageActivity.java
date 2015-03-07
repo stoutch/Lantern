@@ -119,10 +119,11 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
                     Criteria criteria = new Criteria();
                     String bestProvider = locationManager.getBestProvider(criteria, true);
                     Location location = locationManager.getLastKnownLocation(bestProvider);
-                    current = new LatLng(location.getAltitude(), location.getLongitude());
+                    //current = new LatLng(location.getAltitude(), location.getLongitude());
                     if (location != null) {
                         onLocationChanged(location);
                     }
+
                     locationManager.requestLocationUpdates(bestProvider, 20000, 0, this);
                 }
             }
@@ -145,7 +146,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         LatLng latLng = new LatLng(latitude, longitude);
-        googleMap.addMarker(new MarkerOptions().position(latLng));
+        //googleMap.addMarker(new MarkerOptions().position(latLng));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 

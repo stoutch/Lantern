@@ -37,15 +37,15 @@
 
         <activity
             android:name=".InitialMapActivity"
-            android:label="@string/title_activity_initial_map" >
+            android:label="" >
         </activity>
         <activity
             android:name=".InputActivity"
-            android:label="@string/title_activity_input" >
+            android:label="" >
         </activity>
         <activity
             android:name=".ProcessMessageActivity"
-            android:label="@string/title_activity_process_message" >
+            android:label="" >
         </activity>
     </application>
 
