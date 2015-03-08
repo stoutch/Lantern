@@ -9,10 +9,13 @@ http://173.236.254.243:8080/heatmaps/negative?lat=32.725371&lng= -117.160721&rad
 
 http://173.236.254.243:8080/heatmaps/positive?lat=32.725371&lng= -117.160721&radius=2500&total=2
 
-###Add a new value to the heatmap types
+###Add a new element to the heatmap types
 
 "lighting", "police_tower", "police_station", "incident", "security_rating","scenic_rating"
 
+###Values for each new element to the heatmap
+
+[-10,10]
 
 ## Server Interface
 
