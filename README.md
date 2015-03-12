@@ -12,7 +12,7 @@ http://173.236.254.243:8080/routes?dest={"lat":33.781761, "lng":-84.405155}&star
 
 ##### Query Response 
 
-{"response": {"routes":[<Routes obtained from Google>], "route_index": [<index for each route>], "heatmaps": {"positive": [<positive points>], "negative": [<negative points>]}, score: [<score for each route>]}, "success": true}
+{"response": {"routes":[<Routes obtained from Google>], "route_index": [<index for each route>], "heatmaps": {"positive": [<positive points>], "negative": [<negative points>]}, "score": [<score for each route>]}, "success": true}
 
 *Explanation of each key*
 
@@ -35,6 +35,10 @@ http://173.236.254.243:8080/routes?current_position={"lat":33.781761, "lng":-84.
 
 ##### Query Response
 
+TODO: but basically it should only respond, depending if the update was done succesfully.
+
+{"success": true}
+
 ### SetRoute
 ####POST
 
@@ -52,66 +56,79 @@ The last number is the index number given in the get route query
 
 The server just responds true or false depending on the success of the query
 
+###Heatmaps
+
+1. Positive warm heatmap, it shows what places are good.
+2. Negative cold heatmap, it shows what places are bad.
 
 
-http://173.236.254.243:8080/heatmaps/negative?lat=32.725371&lng= -117.160721&radius=2500&total=2
+####Get
+  This function returns the heatap given the position of the user.
 
+#### Query examples
 
-http://173.236.254.243:8080/heatmaps/positive?lat=32.725371&lng= -117.160721&radius=2500&total=2
+1. http://173.236.254.243:8080/heatmaps/positive?lat=32.725371&lng= -117.160721&radius=2500&total=2
+2. http://173.236.254.243:8080/heatmaps/negative?lat=32.725371&lng= -117.160721&radius=2500&total=2
+3. http://173.236.254.243:8080/heatmaps/?lat=32.725371&lng= -117.160721&radius=2500&total=2
 
-###Add a new element to the heatmap types
+*Explanation of each key*
 
+* *lat*: latitude of the current position of the user
+* *lng*: longitude of the current position of ther user
+* *radius*: maximum radius arround the lat/lng that are going to be returned, it should be different depending of the zoom of the app.
+* *total*: maximum number of values to be returned 
+
+##### Query response examples
+
+Using the same number as the query exaples
+
+1. {"response": [{"loc": {"type": "Point", "coordinates": [-117.160721, 32.725371]}, "weight": 10, "value": 10, "lighting_index": 1425843485117, "_id": {"$oid": "54fca51dfc64c614ffab4dee"}, "type": "lighting", "day": "False", "_user_id": 1}, {"loc": {"type": "Point", "coordinates": [-117.160721, 32.725371]}, "weight": 10, "value": 10, "lighting_index": 1426176002741, "_id": {"$oid": "5501b802fc64c669415e8f92"}, "type": "lighting", "day": "False", "_user_id": 1}], "success": true}
+2. {"response": [{"loc": {"type": "Point", "coordinates": [-117.160721, 32.725371]}, "_id": {"$oid": "54f79032fc64c65a0526da49"}, "_user_id": 1}], "success": true}
+3. {"response": {"positive": [{"loc": {"type": "Point", "coordinates": [-117.160721, 32.725371]}, "weight": 10, "value": 10, "lighting_index": 1425843485117, "_id": {"$oid": "54fca51dfc64c614ffab4dee"}, "type": "lighting", "day": "False", "_user_id": 1}, {"loc": {"type": "Point", "coordinates": [-117.160721, 32.725371]}, "weight": 10, "value": 10, "lighting_index": 1426176002741, "_id": {"$oid": "5501b802fc64c669415e8f92"}, "type": "lighting", "day": "False", "_user_id": 1}], "negative": [{"loc": {"type": "Point", "coordinates": [-117.160721, 32.725371]}, "_id": {"$oid": "54f79032fc64c65a0526da49"}, "_user_id": 1}]}, "success": true}
+
+*Explanation of each key*
+
+* *response*: is an array of elements in the heatmap stored in the database
+* * *Each element*:
+* * * *loc*: it is the element that is stored in the database, you should only use the coordinates of this json, which is an array of the form [<longitude>,<latitude>]
+* * * *weight*: is the weight that is given to that type of element
+* * * *<type>_index:* you should not use this, it is an internal index for the database
+* * * *type*: it is the type of element related to the heapmap ("lighting", "police_tower", "police_station", "incident", "security_rating","scenic_rating")
+* * * *value*: it is the rating that an user gave to this type of element.
+
+####Post
+Add a new element to the heatmap. First let explain the characteristics of an element of the heatmap
+
+#####Type
 "lighting", "police_tower", "police_station", "incident", "security_rating","scenic_rating"
 
 ###Values for each new element to the heatmap
+They are in the range of [-10,10]
 
-[-10,10]
+## Query example
 
-## Server Interface
+http://173.236.254.243:8080/heatmaps/positive?lat=32.725371&lng= -117.160721&type=lighting&value=10
+http://173.236.254.243:8080/heatmaps/negative?lat=32.725371&lng= -117.160721&type=lighting&value=10
 
-For each data query we are going to use json structures. Probably
-later we are going to add to each of this structures new 
-spaces for the authentication, have that in mind.
 
-All the next queries are going to be embedded into another json with the next structure
+*Explanation of each element of the query*
 
-{"success":\<True or False\>,"response":\<actual response\>}
+* *lat*: latitude of the current position of the user
+* *lng*: longitude of the current position of ther user
+* *type*: it is the 
+* *value*: is the rating from -10 to 10 that the person is giving to that type of element in the route, if we are using an star rating: 5 stars is a 10 and a 0 is a -10, we just need to scale the vales of the user before sending it to the server. 
 
-### Heatmap
-The heatmap response from the server is going to be an 
-array of dictionaries. Each dictionary has two different
-keywords: latitude and longitude.
+###Query response example
 
-[{"lat":"number" ,"lng":"number" },....,{"lat":"number" ,"lng":"number" }]
+{"response": {"$oid": "5501c0e4fc64c669a012127c"}, "success": true}
 
-The query have the form
-http://\<server address\>:23436/heatmap?lat=\<latitude\>&lng=\<longitude\>
+You need to verify the success flag when doing this query.
 
-I think we need to use two different heatmaps with different gradient colors:
+##Calculation of the score of each route.
 
-1. Positive warm heatmap, it shows what places are good.
-
-2. Negative cold heatmap, it shows what places are bad.
-
-### Routes
-Each query to the server for routes is going to have the following keywords: dest and star.
-estination and starting point are both
-dictionaries of the form {lat: , long: } that describe the
-final and initial position of the routes respectively
-
-The query have the form (for now lets hardcode the userid to 1):
-
-http://\<server address\>:23436/route?userid=1&start={"lat":\<start latitute\>,lng:\<start longitude\>}&dest={"lat":\<destination latitute\>,"lng":\<destination longitude\>}
-
-For this query everything is a string, so in the dictionaries include the quotation marks "" arount both the lat and long, aka you need to serialize the json representation to fit the previous query.
-
-A way to store it in the program would be:
-{"userid":"number" ,"dest": {"lat":"number" ,lng:"number" }, start: {lat:"number","lng":"number"}}
-
-The response to the query is going to be an array of dictionaries.
-Each dictionary has two keywords: name and waypoints. As follows
-
-[{"name":"String","waypoints":[{"lat":"number","lng":"number"},{"lat":"number","lng":"number"},....]},...,{"name":"String","waypoints":[{"lat":"number","lng":"number"},{"lat":"number","lng":"number"},....]}]
+1. We obtain all the heatmaps elements that are close to the route.
+2. Each element in the heatmap has a weight and a value, the weight is assigned depending of the type of element, and the value was the rating given by any user in the past.
+3. We calculate a rating for each line of the route (obtained from the polyline).
 
 ## References 
 
