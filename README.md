@@ -14,7 +14,7 @@ http://173.236.254.243:8080/routes?dest={"lat":33.781761, "lng":-84.405155}&star
 
 {"response": {"routes":[<Routes obtained from Google>], "heatmaps": {"positive": [<positive points>], "negative": [<negative points>]}, score: [<score for each route>]}, "success": true}
 
-*Explanation of each section*
+*Explanation of each key*
 
 * *Response*:Contains all the responses of the query, this a json that contains multiple keys
 * * *routes*: This contains the normal response of google, this is an array of json, each element in this array is a different route, in the same way as using alternatives=true and mode=walking.
@@ -24,8 +24,18 @@ http://173.236.254.243:8080/routes?dest={"lat":33.781761, "lng":-84.405155}&star
 * * *Score:* it is an array, where the index i is the score of the route in the i-th position of the routes array.
 * *Success:* it is a flag that defines if the query was completed succesfully.
 
+#### POST
 
-http://173.236.254.243:8080/routes?dest={"lat":33.781777, "lng":-84.395426}&start={"lat":33.777229,"lng": -84.396187}
+This function is used by the app to select one of the routes as the one selected by the user, it is important so the user can rate the route and other characteristics.
+
+##### Query Example
+
+http://173.236.254.243:8080/routes?current_position={"lat":33.781761, "lng":-84.405155} &route_index=1425850320099&radius=5000000
+
+
+##### Query Response
+
+
 
 
 http://173.236.254.243:8080/heatmaps/negative?lat=32.725371&lng= -117.160721&radius=2500&total=2
