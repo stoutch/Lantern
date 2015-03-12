@@ -1,6 +1,30 @@
 # MAS
 ## Server queries
 
+###Routes
+#### GET
+
+This function is used to obtain the route, the heatmap and the quality value for each of the route
+
+##### Query Example
+
+http://173.236.254.243:8080/routes?dest={"lat":33.781761, "lng":-84.405155}&start={"lat":33.781940,"lng": -84.376917} 
+
+##### Query Response 
+
+{"response": {"routes":[<Routes obtained from Google>], "heatmaps": {"positive": [<positive points>], "negative": [<negative points>]}, score: [<score for each route>]}, "success": true}
+
+*Explanation of each section*
+
+* *Response*:Contains all the responses of the query, this a json that contains multiple keys
+* * *routes*: This contains the normal response of google, this is an array of json, each element in this array is a different route, in the same way as using alternatives=true and mode=walking.
+* * *heataps*: it is a json with two keys.
+* * * *Positive*: contains an array of the different elements that compose the values stored in the server, that are positive. The structure of this elements is explained later.
+* * * *Negative:* contains an array of the different elements that compose the values stored in the server that are over the route, that are negative. The structure i equivalent to the positive.
+* * *Score:* it is an array, where the index i is the score of the route in the i-th position of the routes array.
+* *Success:* it is a flag that defines if the query was completed succesfully.
+
+
 http://173.236.254.243:8080/routes?dest={"lat":33.781777, "lng":-84.395426}&start={"lat":33.777229,"lng": -84.396187}
 
 
