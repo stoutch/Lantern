@@ -128,7 +128,10 @@ You need to verify the success flag when doing this query.
 
 1. We obtain all the heatmaps elements that are close to the route.
 2. Each element in the heatmap has a weight and a value, the weight is assigned depending of the type of element, and the value was the rating given by any user in the past.
-3. We calculate a rating for each line of the route (obtained from the polyline).
+3. We calculate a rating for each line of the route (obtained from the polyline). Using the function
+* W(line) = (\sum_{m\in Positive_Heatmap} weight(m)*value(m) + \sum_{m\in Negative_Heatmap} weight(m)*value(m))/ (\sum_{m\in Positive_Heatmap} weight(m))
+4. After having each route is calculated we obtain the total score of the route as:
+* W(route) = \sum_{line\in Route} W(line)*distance(line) / \sum_{line\in Route} distance(line)
 
 ## References 
 
