@@ -133,6 +133,11 @@ You need to verify the success flag when doing this query.
 4. After having each route is calculated we obtain the total score of the route as:
 * W(route) = \sum_{line\in Route} W(line)*distance(line) / \sum_{line\in Route} distance(line)
 
+### Note
+A response of a score of zero, could mean two things:
+1. There is not rating in the route and there are no persons around. 
+2. The rating of the place could mean is bad and the good elements are equal to the bad elements. This is highly unlike, so we can assume normally number 1.
+
 ## References 
 
 Routes API:
