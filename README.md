@@ -12,13 +12,14 @@ http://173.236.254.243:8080/routes?dest={"lat":33.781761, "lng":-84.405155}&star
 
 ##### Query Response 
 
-{"response": {"routes":[<Routes obtained from Google>], "heatmaps": {"positive": [<positive points>], "negative": [<negative points>]}, score: [<score for each route>]}, "success": true}
+{"response": {"routes":[<Routes obtained from Google>], "route_index": [<index for each route>], "heatmaps": {"positive": [<positive points>], "negative": [<negative points>]}, score: [<score for each route>]}, "success": true}
 
 *Explanation of each key*
 
 * *Response*:Contains all the responses of the query, this a json that contains multiple keys
 * * *routes*: This contains the normal response of google, this is an array of json, each element in this array is a different route, in the same way as using alternatives=true and mode=walking.
-* * *heataps*: it is a json with two keys.
+* * *route_index:* Is the index stored in the server, the i-th position of this array is the index for the i-th route, this is used later to do a post to the server.
+* * *heatmaps*: it is a json with two keys.
 * * * *Positive*: contains an array of the different elements that compose the values stored in the server, that are positive. The structure of this elements is explained later.
 * * * *Negative:* contains an array of the different elements that compose the values stored in the server that are over the route, that are negative. The structure i equivalent to the positive.
 * * *Score:* it is an array, where the index i is the score of the route in the i-th position of the routes array.
