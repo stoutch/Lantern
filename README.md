@@ -27,15 +27,30 @@ http://173.236.254.243:8080/routes?dest={"lat":33.781761, "lng":-84.405155}&star
 
 #### POST
 
-This function is used by the app to select one of the routes as the one selected by the user, it is important so the user can rate the route and other characteristics.
+This function is used by the app to update the approximate times of the route on the server, this call has to be done periodically, but after selecting one route otherwise it would fail.
 
 ##### Query Example
 
 http://173.236.254.243:8080/routes?current_position={"lat":33.781761, "lng":-84.405155} &route_index=1425850320099&radius=5000000
 
+##### Query Response
+
+### SetRoute
+####POST
+
+This function is used to select the route from the possibilities given in the get route function. It has to be done always after the user press the start button.
+
+####Query Example 
+
+http://173.236.254.243:8080/routes/select/1425850320099
+
+The last number is the index number given in the get route query
 
 ##### Query Response
 
+{"success": true}
+
+The server just responds true or false depending on the success of the query
 
 
 
