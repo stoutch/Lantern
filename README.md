@@ -4,7 +4,7 @@
 ###Routes
 #### GET
 
-This function is used to obtain the route, the heatmap and the quality value for each of the route
+This function is used to obtain the route, the heatmap and the quality value for each of the routes.
 
 ##### Query Example
 
