@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +63,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
     String xmlString;
     ArrayList wayPoints;
     LatLng current;
+    int selected_route = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -337,5 +339,11 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
             wayOptions.add(list_of_geopoints.get(i));
         }
         Polyline myRoutes = googleMap.addPolyline(wayOptions);
+    }
+
+    public void inputDestination(View view) {
+        Intent intent = new Intent(this, Navigation.class);
+        intent.putExtra("selected_route", selected_route);
+        startActivity(intent);
     }
 }
