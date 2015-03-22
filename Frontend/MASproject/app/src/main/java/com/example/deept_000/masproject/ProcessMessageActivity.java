@@ -63,7 +63,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
     String xmlString;
     ArrayList wayPoints;
     LatLng current;
-    int selected_route = 0;
+    int selected_route;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +73,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
         String message = intent.getStringExtra(InputActivity.EXTRA_MESSAGE);
 
         setContentView(R.layout.activity_process_message);
+        selected_route = 0;
         setUpMapIfNeeded();
 
         /* Start: */
@@ -341,7 +342,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
         Polyline myRoutes = googleMap.addPolyline(wayOptions);
     }
 
-    public void inputDestination(View view) {
+    public void startNavigation(View view) {
         Intent intent = new Intent(this, Navigation.class);
         intent.putExtra("selected_route", selected_route);
         startActivity(intent);

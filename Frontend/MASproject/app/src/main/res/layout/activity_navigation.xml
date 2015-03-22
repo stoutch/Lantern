@@ -42,8 +42,4 @@
             android:textSize="13dp"
             android:id="@+id/button3" />
     </LinearLayout>
-
-
-
-
 </FrameLayout>
