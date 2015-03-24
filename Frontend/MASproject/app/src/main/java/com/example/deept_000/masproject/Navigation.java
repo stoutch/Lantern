@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +17,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
+
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Random;
 import android.app.Dialog;
@@ -22,19 +26,20 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 
 public class Navigation extends ActionBarActivity {
 
     GoogleMap googleMap;
-    List<ArrayList<LatLng>> candidates;
-    Location mLastLocation;
-    GoogleApiClient mGoogleApiClient;
-    LatLng current;
-
-
     int selected_route;
-    String serverURL = "http://173.236.254.243:8080/";
+    public static String serverURL = "http://173.236.254.243:8080/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,50 +138,93 @@ public class Navigation extends ActionBarActivity {
         HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().data(list).radius(15).opacity(.5).build();
         TileOverlay overlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
-    public void reportButton(View view) {
-            String url;
-        //Get current location
-            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            Criteria criteria = new Criteria();
-            String bestProvider = locationManager.getBestProvider(criteria, true);
-            Location location = locationManager.getLastKnownLocation(bestProvider);
-            final LatLng current = new LatLng(location.getAltitude(), location.getLongitude());
-            if (location == null) {
-                //Fail - display alert saying couldn't get location
-                return;
-            }
 
+    private class AsyncPostData extends AsyncTask<String, Void, String> { // last variable: return value of doInBackground
+
+        public AsyncResponse delegate = null;
+
+        @Override
+        protected String doInBackground(String... params) {
+            String result = null;
+            String url = params[0];
+            try {
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpGet httpPost = new HttpGet(url);
+                HttpResponse httpResponse = httpClient.execute(httpPost);
+                HttpEntity httpEntity = httpResponse.getEntity();
+                result = EntityUtils.toString(httpEntity);
+                }
+            catch (Exception ex) {
+                Toast errorToast =
+                        Toast.makeText(getApplicationContext(),
+                                "Error reading xml", Toast.LENGTH_LONG);
+                errorToast.show();
+            }
+            System.out.println(result);
+            return result;
+        }
+
+
+        protected void onPostExecute(String result){
+            delegate.processFinish(result);
+        }
+    }
+
+    public void reportButton(View view) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = Navigation.this.getLayoutInflater();
             builder.setView(inflater.inflate(R.layout.report_dialog, null))
                     // Add action buttons
-            /*        .setPositiveButton(R.string.done, new DialogInterface.OnClickListener() {
+                    .setPositiveButton(R.string.done, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
                             // send to server
                         }
                     })
-            */
+
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             dialog.cancel();
                         }
                     });
             AlertDialog report_dialog = builder.create();
+            /*
             LinearLayout lighting = (LinearLayout) report_dialog.findViewById(R.id.lighting_layout);
             lighting.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //send lighting update to server - right now as -4
-                    //url = serverURL+"heatmaps/negative?lat="+ Double.toString(current.latitude)+"&lng=" + Double.toString(current.longitude) + "&type=lighting&value=4";
+                    //
+                    try {
+                        //Get current location
+                        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                        Criteria criteria = new Criteria();
+                        String bestProvider = locationManager.getBestProvider(criteria, true);
+                        Location location = locationManager.getLastKnownLocation(bestProvider);
+                        if (location == null) {
+                            //Fail - display alert saying couldn't get location
+                            return;
+                        }
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+                        String location_string = "lat="+ Double.toString(latitude)+"&lng=" + Double.toString(longitude);
+                        String url = serverURL+"heatmaps/negative?"+ location_string + "&type=lighting&value=4";
+                        AsyncPostData post_rating = new AsyncPostData();
+                        post_rating.execute(url);
+                       // post_rating.delegate = this;
 
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
+            */
             LinearLayout police_tower = (LinearLayout) report_dialog.findViewById(R.id.police_tower_layout);
             police_tower.setOnClickListener(new View.OnClickListener() {
             @Override
                 public void onClick(View v) {
                 //send police tower update to server
+                System.out.println("Clicked police tower");
                 }
             });
             LinearLayout road_closure = (LinearLayout) report_dialog.findViewById(R.id.police_station_layout);
@@ -186,7 +234,9 @@ public class Navigation extends ActionBarActivity {
                 //send road closure update to server
                 }
             });
+
             report_dialog.show();
+
     }
     // This is the function called on clicking the End button
     /*
