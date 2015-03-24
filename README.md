@@ -63,7 +63,7 @@ The server just responds true or false depending on the success of the query
 
 
 ####Get
-  This function returns the heatap given the position of the user.
+  This function returns the heatap given the position of the user. To actually display it in the heatmap, we require to add to the array of the heatmap as many as weight*value/10 elements.
 
 #### Query examples
 
@@ -80,7 +80,7 @@ The server just responds true or false depending on the success of the query
 
 ##### Query response examples
 
-Using the same number as the query exaples
+Using the same number as the query examples
 
 1. {"response": [{"loc": {"type": "Point", "coordinates": [-117.160721, 32.725371]}, "weight": 10, "value": 10, "lighting_index": 1425843485117, "_id": {"$oid": "54fca51dfc64c614ffab4dee"}, "type": "lighting", "day": "False", "_user_id": 1}, {"loc": {"type": "Point", "coordinates": [-117.160721, 32.725371]}, "weight": 10, "value": 10, "lighting_index": 1426176002741, "_id": {"$oid": "5501b802fc64c669415e8f92"}, "type": "lighting", "day": "False", "_user_id": 1}], "success": true}
 2. {"response": [{"loc": {"type": "Point", "coordinates": [-117.160721, 32.725371]}, "_id": {"$oid": "54f79032fc64c65a0526da49"}, "_user_id": 1}], "success": true}
