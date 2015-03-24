@@ -4,7 +4,7 @@
 ###Routes
 #### GET
 
-This function is used to obtain the route, the heatmap and the quality value for each of the routes.
+This function is used to obtain the route, the heatmap and the quality value for each of the routes.  To actually display it in the heatmap, we require to add to the array of the heatmap as many as weight*value/10 elements.
 
 ##### Query Example
 
