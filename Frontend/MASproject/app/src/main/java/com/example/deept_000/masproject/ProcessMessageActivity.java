@@ -114,7 +114,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
                 if (googleMap != null) {
                     LatLng tech = new LatLng(33.775635, -84.396444);
                     googleMap.setMyLocationEnabled(true);
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 15));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 13));
                     addHeatMap();
 
                     /* Location Manager: */
@@ -344,7 +344,8 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
     public void startNavigation(View view) {
         Intent intent = new Intent(this, Navigation.class);
-        intent.putExtra("selected_route", selected_route);
+        String route = Integer.toString(selected_route);
+        intent.putExtra("selected_route", route);
         startActivity(intent);
     }
 }

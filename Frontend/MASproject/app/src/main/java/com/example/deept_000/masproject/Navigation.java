@@ -2,6 +2,9 @@ package com.example.deept_000.masproject;
 
 import android.app.DialogFragment;
 import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,12 +28,13 @@ public class Navigation extends ActionBarActivity {
 
     GoogleMap googleMap;
     int selected_route;
+    String serverURL = "http://173.236.254.243:8080/";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
-        String data = getIntent().getStringExtra("selected_route");
-        selected_route = Integer.parseInt(data);
+        selected_route = Integer.parseInt(getIntent().getStringExtra("selected_route"));
         setUpMapIfNeeded();
     }
 
@@ -71,7 +75,7 @@ public class Navigation extends ActionBarActivity {
                 if (googleMap != null) {
                     LatLng tech = new LatLng(33.775635, -84.396444);
                     googleMap.setMyLocationEnabled(true);
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 15));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 13));
                     addHeatMap();
                 }
             }
@@ -124,6 +128,18 @@ public class Navigation extends ActionBarActivity {
         TileOverlay overlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
     public void reportButton(View view) {
+            String url;
+        //Get current location
+            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            Criteria criteria = new Criteria();
+            String bestProvider = locationManager.getBestProvider(criteria, true);
+            Location location = locationManager.getLastKnownLocation(bestProvider);
+            final LatLng current = new LatLng(location.getAltitude(), location.getLongitude());
+            if (location == null) {
+                //Fail - display alert saying couldn't get location
+                return;
+            }
+
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = Navigation.this.getLayoutInflater();
             builder.setView(inflater.inflate(R.layout.report_dialog, null))
@@ -145,7 +161,9 @@ public class Navigation extends ActionBarActivity {
             lighting.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //send lighting update to server
+                    //send lighting update to server - right now as -4
+                    url = serverURL+"heatmaps/negative?lat="+ Double.toString(current.latitude)+"&lng=" + Double.toString(current.longitude) + "&type=lighting&value=4";
+
                 }
             });
             LinearLayout police_tower = (LinearLayout) report_dialog.findViewById(R.id.police_layout);
