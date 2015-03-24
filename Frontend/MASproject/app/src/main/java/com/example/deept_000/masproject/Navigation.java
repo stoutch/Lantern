@@ -27,6 +27,12 @@ import android.widget.LinearLayout;
 public class Navigation extends ActionBarActivity {
 
     GoogleMap googleMap;
+    List<ArrayList<LatLng>> candidates;
+    Location mLastLocation;
+    GoogleApiClient mGoogleApiClient;
+    LatLng current;
+
+
     int selected_route;
     String serverURL = "http://173.236.254.243:8080/";
 
@@ -162,18 +168,18 @@ public class Navigation extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {
                     //send lighting update to server - right now as -4
-                    url = serverURL+"heatmaps/negative?lat="+ Double.toString(current.latitude)+"&lng=" + Double.toString(current.longitude) + "&type=lighting&value=4";
+                    //url = serverURL+"heatmaps/negative?lat="+ Double.toString(current.latitude)+"&lng=" + Double.toString(current.longitude) + "&type=lighting&value=4";
 
                 }
             });
-            LinearLayout police_tower = (LinearLayout) report_dialog.findViewById(R.id.police_layout);
+            LinearLayout police_tower = (LinearLayout) report_dialog.findViewById(R.id.police_tower_layout);
             police_tower.setOnClickListener(new View.OnClickListener() {
             @Override
                 public void onClick(View v) {
                 //send police tower update to server
                 }
             });
-            LinearLayout road_closure = (LinearLayout) report_dialog.findViewById(R.id.closure_layout);
+            LinearLayout road_closure = (LinearLayout) report_dialog.findViewById(R.id.police_station_layout);
             road_closure.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

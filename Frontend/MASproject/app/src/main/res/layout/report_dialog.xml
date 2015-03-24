@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"
-            android:id="@+id/police_layout">
+            android:id="@+id/police_tower_layout">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -78,7 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
-                android:id="@+id/closure_layout">
+                android:id="@+id/police_station_layout">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -94,7 +94,7 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:text="Road closure"
+                    android:text="Police station"
                     android:id="@+id/closure"
                     android:background="#fff0f0f0"
                     android:layout_weight="50"

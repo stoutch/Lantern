@@ -36,6 +36,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -44,6 +47,8 @@ import org.xml.sax.SAXException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +62,8 @@ import javax.xml.parsers.ParserConfigurationException;
 public class ProcessMessageActivity extends ActionBarActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, AsyncResponse{
     GoogleMap googleMap;
-
     Location mLastLocation;
+    List<ArrayList<LatLng>> candidates;
     GoogleApiClient mGoogleApiClient;
     String xmlString;
     ArrayList wayPoints;
@@ -246,13 +251,38 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
     public void getDirections(double lat1, double lon1, double lat2, double lon2) {
         int a = 12;
+        // { before after, include ", escape\" etc. see github comment
         String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" +lat1 + "," + lon1  + "&destination=" + lat2 + "," + lon2 + "&sensor=false&units=metric&mode=walking";
+//        AsyncPostData getxml = new AsyncPostData();
+//        getxml.execute(url);
+//        getxml.delegate = this;
+        //String url_json = "http://maps.googleapis.com/maps/api/directions/json?origin=" +lat1 + "," + lon1  + "&destination=" + lat2 + "," + lon2 + "&sensor=false&units=metric&mode=walking&alternatives=true";
 
-        AsyncPostData getxml = new AsyncPostData();
-        getxml.execute(url);
-        getxml.delegate = this;
+        // from server:
+        // String routesHeatmapFromServer = "http://173.236.254.243:8080/routes?dest={%22lat%22:33.781777,%20%22lng%22:-84.395426}&start={%22lat%22:33.777229,%22lng%22:%20-84.396187}";
+
+        // String rfs = "http://173.236.254.243:8080/routes?dest={\"lat\":33.781761, \"lng\":-84.405155}&start={\"lat\":33.781940,\"lng\": -84.376917}";
+
+
+        try {
+            String star = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781940) + ",\"lng\":" + String.valueOf(-84.376917) + "}", "UTF-8");
+//            String slng = URLEncoder.encode(String.valueOf(-84.396187), "UTF-8");
+            String dest = URLEncoder.encode("{\"lat\":"+String.valueOf(33.781761)+",\"lng\":"+String.valueOf(-84.405155)+"}", "UTF-8");
+//            String dlng = URLEncoder.encode(String.valueOf(-84.395426), "UTF-8");
+
+            String routesHeatmapFromServer = "http://173.236.254.243:8080/routes?dest="+dest+"&start="+star;//{\"lat\":"+dlat+",\"lng\":"+dlng+"}&start={\"lat\":"+slat+",\"lng\":"+slng+"}";
+
+            AsyncPostData getJSON = new AsyncPostData();
+            getJSON.execute(routesHeatmapFromServer);
+            getJSON.delegate = this;
+
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
     }
+
 
     private class AsyncPostData extends AsyncTask<String, Void, String> { // last variable: return value of doInBackground
 
@@ -299,48 +329,89 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
     @Override
     public void processFinish(String output) {
-        InputStream stream = new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8)); // starndardcharset warning
-        DocumentBuilder builder = null;
+
+        Log.i("in processFinish:", output);
         try {
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
-        String tag[] = { "lat", "lng" };
-        Document doc = null;
-        try {
-            doc = builder.parse(stream);
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        ArrayList<LatLng> list_of_geopoints = new ArrayList();
-        if (doc != null) {
-            NodeList nl1, nl2;
-            nl1 = doc.getElementsByTagName(tag[0]);
-            nl2 = doc.getElementsByTagName(tag[1]);
-            if (nl1.getLength() > 0) {
-                list_of_geopoints = new ArrayList();
-                for (int i = 0; i < nl1.getLength()-4; i++) { // start, end, bound1, bound2
-                    Node node1 = nl1.item(i);
-                    Node node2 = nl2.item(i);
-                    double lat = Double.parseDouble(node1.getTextContent());
-                    double lng = Double.parseDouble(node2.getTextContent());
-                    list_of_geopoints.add(new LatLng((double) (lat), (double) (lng)));
+            JSONObject top = new JSONObject(output); // outer bracket
+            JSONArray routes = top.getJSONObject("response").getJSONArray("routes");
+
+            candidates = new ArrayList<ArrayList<LatLng>>();
+            for(int i=0; i<routes.length(); ++i){
+                JSONObject curr_route_total = routes.getJSONObject(i);
+                JSONArray legs = curr_route_total.getJSONArray("legs");
+
+                candidates.add(new ArrayList<LatLng>());
+                int candidates_tail = candidates.size()-1;
+
+                for(int j=0; j<legs.length(); ++j){
+                    JSONObject curr_leg_total = legs.getJSONObject(j);
+                    JSONObject curr_leg_start = curr_leg_total.getJSONObject("start_location");
+                    JSONObject curr_leg_end = curr_leg_total.getJSONObject("end_location");
+
+                    double start_lat = curr_leg_start.getDouble("lat");
+                    double start_lng = curr_leg_start.getDouble("lng");
+                    LatLng leg_start_latlng = new LatLng(start_lat, start_lng);
+
+                    double end_lat = curr_leg_end.getDouble("lat");
+                    double end_lng = curr_leg_end.getDouble("lng");
+                    LatLng leg_end_latlng = new LatLng(end_lat, end_lng);
+
+                    candidates.get(candidates_tail).add(leg_start_latlng);
+                    candidates.get(candidates_tail).add(leg_end_latlng);
                 }
-            } else {
-                // No points found
             }
-        }
+            if(output.contains("heatmap"))
+                Log.i("candidate count:", ""+candidates.size());
+            Log.i("route 1:", ""+candidates.get(0).size());
+            Log.i("route 2:", ""+candidates.get(1).size());
+            //Log.i("route 3:", ""+candidates.get(2).size());
 
-
-        PolylineOptions wayOptions = new PolylineOptions();
-        for(int i=0; i<list_of_geopoints.size(); i++){
-            wayOptions.add(list_of_geopoints.get(i));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        Polyline myRoutes = googleMap.addPolyline(wayOptions);
+//        InputStream stream = new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8)); // starndardcharset warning
+//        DocumentBuilder builder = null;
+//        try {
+//            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+//        } catch (ParserConfigurationException e) {
+//            e.printStackTrace();
+//        }
+//        String tag[] = { "lat", "lng" };
+//        Document doc = null;
+//        try {
+//            doc = builder.parse(stream);
+//        } catch (SAXException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        ArrayList<LatLng> list_of_geopoints = new ArrayList();
+//        if (doc != null) {
+//            NodeList nl1, nl2;
+//            nl1 = doc.getElementsByTagName(tag[0]);
+//            nl2 = doc.getElementsByTagName(tag[1]);
+//            if (nl1.getLength() > 0) {
+//                list_of_geopoints = new ArrayList();
+//                for (int i = 0; i < nl1.getLength()-4; i++) { // start, end, bound1, bound2
+//                    Node node1 = nl1.item(i);
+//                    Node node2 = nl2.item(i);
+//                    double lat = Double.parseDouble(node1.getTextContent());
+//                    double lng = Double.parseDouble(node2.getTextContent());
+//                    list_of_geopoints.add(new LatLng((double) (lat), (double) (lng)));
+//                }
+//            } else {
+//                // No points found
+//            }
+//        }
+//
+//
+//        PolylineOptions wayOptions = new PolylineOptions();
+//        for(int i=0; i<list_of_geopoints.size(); i++){
+//            wayOptions.add(list_of_geopoints.get(i));
+//        }
+//        Polyline myRoutes = googleMap.addPolyline(wayOptions);
     }
+
 
     public void startNavigation(View view) {
         Intent intent = new Intent(this, Navigation.class);
