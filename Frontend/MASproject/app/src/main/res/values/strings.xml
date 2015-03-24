@@ -10,5 +10,11 @@
     <string name="title_activity_input">InputActivity</string>
     <string name="title_activity_process_message">ProcessMessageActivity</string>
     <string name="title_activity_navigation">Navigation</string>
+    <string name="report_dialog_title">What would you like to report?</string>
+    <string name="report_lighting">Bad lighting</string>
+    <string name="report_police_tower">Police tower</string>
+    <string name="report_road_closure">Road closure</string>
+    <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

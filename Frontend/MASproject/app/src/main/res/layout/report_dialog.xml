@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/report_dialog">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/report_dialog_title"
+        android:id="@+id/textView2"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:layout_marginBottom="10dp" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:id="@+id/lighting_layout">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+
+                android:id="@+id/imageView"
+                android:src="@drawable/clipboard"
+                android:maxHeight="30dp"
+                android:adjustViewBounds="true"
+                android:paddingLeft="20dp"
+                android:paddingRight="40dp"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="Bad lighting"
+                android:id="@+id/lighting"
+                android:background="#fff0f0f0"
+                android:layout_weight="50"
+                android:textColor="#ff7f7f7f"
+                android:gravity="left|center_vertical" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:id="@+id/police_layout">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+
+                android:id="@+id/imageView2"
+                android:src="@drawable/clipboard"
+                android:maxHeight="30dp"
+                android:adjustViewBounds="true"
+                android:paddingLeft="20dp"
+                android:paddingRight="40dp"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="Police tower"
+                android:id="@+id/police_tower"
+                android:background="#fff0f0f0"
+                android:layout_weight="50"
+                android:textColor="#ff7f7f7f"
+                android:gravity="left|center_vertical" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:id="@+id/closure_layout">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+
+                    android:id="@+id/imageView3"
+                    android:src="@drawable/clipboard"
+                    android:maxHeight="30dp"
+                    android:adjustViewBounds="true"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="40dp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:text="Road closure"
+                    android:id="@+id/closure"
+                    android:background="#fff0f0f0"
+                    android:layout_weight="50"
+                    android:textColor="#ff7f7f7f"
+                    android:gravity="left|center_vertical"/>
+
+            </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

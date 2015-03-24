@@ -1,7 +1,10 @@
 package com.example.deept_000.masproject;
 
+import android.app.DialogFragment;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.google.android.gms.maps.*;
@@ -11,6 +14,11 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import java.util.ArrayList;
 import java.util.Random;
+import android.app.Dialog;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.view.View;
+import android.widget.LinearLayout;
 
 
 public class Navigation extends ActionBarActivity {
@@ -115,5 +123,53 @@ public class Navigation extends ActionBarActivity {
         HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().data(list).radius(15).opacity(.5).build();
         TileOverlay overlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
-
+    public void reportButton(View view) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LayoutInflater inflater = Navigation.this.getLayoutInflater();
+            builder.setView(inflater.inflate(R.layout.report_dialog, null))
+                    // Add action buttons
+            /*        .setPositiveButton(R.string.done, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            // send to server
+                        }
+                    })
+            */
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog report_dialog = builder.create();
+            LinearLayout lighting = (LinearLayout) report_dialog.findViewById(R.id.lighting_layout);
+            lighting.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //send lighting update to server
+                }
+            });
+            LinearLayout police_tower = (LinearLayout) report_dialog.findViewById(R.id.police_layout);
+            police_tower.setOnClickListener(new View.OnClickListener() {
+            @Override
+                public void onClick(View v) {
+                //send police tower update to server
+                }
+            });
+            LinearLayout road_closure = (LinearLayout) report_dialog.findViewById(R.id.closure_layout);
+            road_closure.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                //send road closure update to server
+                }
+            });
+            report_dialog.show();
+    }
+    // This is the function called on clicking the End button
+    /*
+    public void endNavigation(View view) {
+        Intent intent = new Intent(this, RatingActivity.class);
+        intent.putExtra("selected_route", selected_route);
+        startActivity(intent);
+    }
+    */
 }
