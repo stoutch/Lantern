@@ -3,6 +3,9 @@ package com.example.deept_000.masproject;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -28,10 +31,16 @@ import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -52,9 +61,7 @@ public class Navigation extends ActionBarActivity {
             Bundle bundle = getIntent().getExtras();
             route = bundle.getParcelableArrayList("selected_route");
             postSelectedRoute();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -89,13 +96,13 @@ public class Navigation extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void postSelectedRoute()
-    {
+    private void postSelectedRoute() {
         return;
     }
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
+        HeatmapProvider provider = new HeatmapProvider();
         try {
             if (googleMap == null) {
                 // Try to obtain the map from the SupportMapFragment.
@@ -105,7 +112,8 @@ public class Navigation extends ActionBarActivity {
                     LatLng tech = new LatLng(33.775635, -84.396444);
                     googleMap.setMyLocationEnabled(true);
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 13));
-                    addHeatMap();
+                    provider.addHeatmap(googleMap, getLastLocation());
+                    //addHeatMap();
                     displayRoute();
                 }
             }
@@ -117,9 +125,8 @@ public class Navigation extends ActionBarActivity {
             googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             // Check if we were successful in obtaining the map.
             if (googleMap != null) {
-                HeatmapProvider provider = new HeatmapProvider();
-                TileOverlay overlay = googleMap.addTileOverlay(provider.addHeatMap(googleMap));
-                //addHeatMap();
+                provider.addHeatmap(googleMap, getLastLocation());
+                //addHeatmap();
             }
         }
     }
@@ -161,10 +168,9 @@ public class Navigation extends ActionBarActivity {
         TileOverlay overlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
 
-    private void displayRoute()
-    {
+    private void displayRoute() {
         PolylineOptions wayOptions = new PolylineOptions();
-        for(int i=0; i<route.size(); i++){
+        for (int i = 0; i < route.size(); i++) {
             wayOptions.add(route.get(i));
         }
         Polyline myRoutes = googleMap.addPolyline(wayOptions);
@@ -285,6 +291,7 @@ public class Navigation extends ActionBarActivity {
                 int rating = (int) rb.getRating();
                 System.out.println("Clicked done, rating::: " + rating);
                 dialog.dismiss();
+                sendRating(rating);
             }
         });
 
@@ -299,4 +306,53 @@ public class Navigation extends ActionBarActivity {
         dialog.show();
     }
 
+    public void sendRating(int rating) {
+        //Filler material for now
+        HttpGetTask httpGet = new HttpGetTask();
+        httpGet.execute("http://173.236.254.243:8080/heatmaps/positive?lat=32.725371&lng=%20-117.160721&radius=2500&total=2");
+    }
+
+    private class HttpGetTask extends AsyncTask<String, Integer, HttpResponse> {
+
+        @Override
+        protected HttpResponse doInBackground(String... params) {
+            try {
+                HttpGet httpGet = new HttpGet(params[0]);
+                httpGet.setHeader("Accept", "application/json");
+                httpGet.setHeader("Content-type", "application/json");
+                return new DefaultHttpClient().execute(httpGet);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(HttpResponse response) {
+            try {
+                System.out.println(readIt(response.getEntity().getContent(), 450));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+        Reader reader = null;
+        reader = new InputStreamReader(stream, "UTF-8");
+        char[] buffer = new char[len];
+        reader.read(buffer);
+        return new String(buffer);
+    }
+
+    public Location getLastLocation() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String bestProvider = locationManager.getBestProvider(criteria, true);
+        return locationManager.getLastKnownLocation(bestProvider);
+    }
 }

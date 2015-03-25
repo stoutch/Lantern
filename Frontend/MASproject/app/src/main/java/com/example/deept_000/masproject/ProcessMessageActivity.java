@@ -97,6 +97,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
+        HeatmapProvider provider = new HeatmapProvider();
         try {
             if (googleMap == null) {
                 // Try to obtain the map from the SupportMapFragment.
@@ -106,12 +107,13 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
                     LatLng tech = new LatLng(33.775635, -84.396444);
                     googleMap.setMyLocationEnabled(true);
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 13));
-                    addHeatMap();
+                    //addHeatMap();
                     /* Location Manager: */
                     LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                     Criteria criteria = new Criteria();
                     String bestProvider = locationManager.getBestProvider(criteria, true);
                     Location location = locationManager.getLastKnownLocation(bestProvider);
+                    provider.addHeatmap(googleMap, location);
                     //current = new LatLng(location.getAltitude(), location.getLongitude());
                     if (location != null) {
                         onLocationChanged(location);
@@ -128,7 +130,12 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
             googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             // Check if we were successful in obtaining the map.
             if (googleMap != null) {
-                addHeatMap();
+                LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                Criteria criteria = new Criteria();
+                String bestProvider = locationManager.getBestProvider(criteria, true);
+                Location location = locationManager.getLastKnownLocation(bestProvider);
+                provider.addHeatmap(googleMap, location);
+                //addHeatMap();
             }
         }
     }
