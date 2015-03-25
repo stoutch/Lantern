@@ -8,13 +8,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -24,9 +23,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
@@ -39,28 +35,17 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 
 public class ProcessMessageActivity extends ActionBarActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, AsyncResponse{
+        GoogleApiClient.OnConnectionFailedListener, AsyncResponse {
     GoogleMap googleMap;
     Location mLastLocation;
     List<ArrayList<LatLng>> candidates;
@@ -121,7 +106,6 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
                     googleMap.setMyLocationEnabled(true);
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 13));
                     addHeatMap();
-
                     /* Location Manager: */
                     LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                     Criteria criteria = new Criteria();
@@ -135,7 +119,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
                     locationManager.requestLocationUpdates(bestProvider, 20000, 0, this);
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         if (googleMap == null) {
@@ -175,7 +159,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
     }
 
-    private void addHeatMap(){
+    private void addHeatMap() {
         ArrayList<LatLng> list = new ArrayList<LatLng>();
         double minLat = 33.775238;
         double minLong = -84.396663;
@@ -183,9 +167,9 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
         double maxLong = -84.396744;
         double randLat, randLong;
         Random rand = new Random();
-        for (int i = 0; i < 15; i++){
-            randLat = rand.nextDouble()*(maxLat-minLat) + minLat;
-            randLong = rand.nextDouble()*(maxLong-minLong) + minLong;
+        for (int i = 0; i < 15; i++) {
+            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
+            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
             list.add(new LatLng(randLat, randLong));
         }
 
@@ -193,9 +177,9 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
         minLong = -84.398498;
         maxLat = 33.773949;
         maxLong = -84.394920;
-        for (int i = 0; i < 15; i++){
-            randLat = rand.nextDouble()*(maxLat-minLat) + minLat;
-            randLong = rand.nextDouble()*(maxLong-minLong) + minLong;
+        for (int i = 0; i < 15; i++) {
+            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
+            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
             list.add(new LatLng(randLat, randLong));
         }
 
@@ -203,9 +187,9 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
         minLong = -84.397876;
         maxLat = 33.777775;
         maxLong = -84.397811;
-        for (int i = 0; i < 15; i++){
-            randLat = rand.nextDouble()*(maxLat-minLat) + minLat;
-            randLong = rand.nextDouble()*(maxLong-minLong) + minLong;
+        for (int i = 0; i < 15; i++) {
+            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
+            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
             list.add(new LatLng(randLat, randLong));
         }
         HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().data(list).radius(15).opacity(.5).build();
@@ -252,7 +236,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
     public void getDirections(double lat1, double lon1, double lat2, double lon2) {
         int a = 12;
         // { before after, include ", escape\" etc. see github comment
-        String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" +lat1 + "," + lon1  + "&destination=" + lat2 + "," + lon2 + "&sensor=false&units=metric&mode=walking";
+        String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" + lat1 + "," + lon1 + "&destination=" + lat2 + "," + lon2 + "&sensor=false&units=metric&mode=walking";
 //        AsyncPostData getxml = new AsyncPostData();
 //        getxml.execute(url);
 //        getxml.delegate = this;
@@ -267,10 +251,10 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
         try {
             String star = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781940) + ",\"lng\":" + String.valueOf(-84.376917) + "}", "UTF-8");
 //            String slng = URLEncoder.encode(String.valueOf(-84.396187), "UTF-8");
-            String dest = URLEncoder.encode("{\"lat\":"+String.valueOf(33.781761)+",\"lng\":"+String.valueOf(-84.405155)+"}", "UTF-8");
+            String dest = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781761) + ",\"lng\":" + String.valueOf(-84.405155) + "}", "UTF-8");
 //            String dlng = URLEncoder.encode(String.valueOf(-84.395426), "UTF-8");
 
-            String routesHeatmapFromServer = "http://173.236.254.243:8080/routes?dest="+dest+"&start="+star;//{\"lat\":"+dlat+",\"lng\":"+dlng+"}&start={\"lat\":"+slat+",\"lng\":"+slng+"}";
+            String routesHeatmapFromServer = "http://173.236.254.243:8080/routes?dest=" + dest + "&start=" + star;//{\"lat\":"+dlat+",\"lng\":"+dlng+"}&start={\"lat\":"+slat+",\"lng\":"+slng+"}";
 
             AsyncPostData getJSON = new AsyncPostData();
             getJSON.execute(routesHeatmapFromServer);
@@ -290,19 +274,19 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
         @Override
         protected String doInBackground(String... params) {
-            String result = getXML (params[0]);
+            String result = getXML(params[0]);
             return result;
         }
 
 
-        protected void onPostExecute(String result){
+        protected void onPostExecute(String result) {
             delegate.processFinish(result);
         }
 
 
-
     }
-    public String getXML (String url){
+
+    public String getXML(String url) {
 
         String result = null;
 
@@ -336,14 +320,14 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
             JSONArray routes = top.getJSONObject("response").getJSONArray("routes");
 
             candidates = new ArrayList<ArrayList<LatLng>>();
-            for(int i=0; i<routes.length(); ++i){
+            for (int i = 0; i < routes.length(); ++i) {
                 JSONObject curr_route_total = routes.getJSONObject(i);
                 JSONArray legs = curr_route_total.getJSONArray("legs");
 
                 candidates.add(new ArrayList<LatLng>());
-                int candidates_tail = candidates.size()-1;
+                int candidates_tail = candidates.size() - 1;
 
-                for(int j=0; j<legs.length(); ++j){
+                for (int j = 0; j < legs.length(); ++j) {
                     JSONObject curr_leg_total = legs.getJSONObject(j);
                     JSONObject curr_leg_start = curr_leg_total.getJSONObject("start_location");
                     JSONObject curr_leg_end = curr_leg_total.getJSONObject("end_location");
@@ -360,10 +344,10 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
                     candidates.get(candidates_tail).add(leg_end_latlng);
                 }
             }
-            if(output.contains("heatmap"))
-                Log.i("candidate count:", ""+candidates.size());
-            Log.i("route 1:", ""+candidates.get(0).size());
-            Log.i("route 2:", ""+candidates.get(1).size());
+            if (output.contains("heatmap"))
+                Log.i("candidate count:", "" + candidates.size());
+            Log.i("route 1:", "" + candidates.get(0).size());
+            Log.i("route 2:", "" + candidates.get(1).size());
             //Log.i("route 3:", ""+candidates.get(2).size());
 
         } catch (JSONException e) {
