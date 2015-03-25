@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		482052E41AC27920002990D7 /* GoogleMaps.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 482052E31AC27920002990D7 /* GoogleMaps.framework */; };
 		4886D0EF1AC1EFAA00550CB5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4886D0EE1AC1EFAA00550CB5 /* AppDelegate.swift */; };
 		4886D0F11AC1EFAA00550CB5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4886D0F01AC1EFAA00550CB5 /* ViewController.swift */; };
 		4886D0F41AC1EFAA00550CB5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4886D0F21AC1EFAA00550CB5 /* Main.storyboard */; };
 		4886D0F61AC1EFAA00550CB5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4886D0F51AC1EFAA00550CB5 /* Images.xcassets */; };
 		4886D0F91AC1EFAA00550CB5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4886D0F71AC1EFAA00550CB5 /* LaunchScreen.xib */; };
 		4886D1051AC1EFAA00550CB5 /* MAS_projectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4886D1041AC1EFAA00550CB5 /* MAS_projectTests.swift */; };
-		4886D10F1AC1FD4400550CB5 /* GoogleMaps.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4886D10E1AC1FD4400550CB5 /* GoogleMaps.framework */; };
 		4886D1111AC1FDE000550CB5 /* GoogleMaps.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4886D1101AC1FDE000550CB5 /* GoogleMaps.bundle */; };
 		4886D1411AC201A500550CB5 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4886D1401AC201A500550CB5 /* AVFoundation.framework */; };
 		4886D1431AC201AE00550CB5 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4886D1421AC201AE00550CB5 /* CoreData.framework */; };
@@ -52,6 +52,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		482052E31AC27920002990D7 /* GoogleMaps.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleMaps.framework; sourceTree = "<group>"; };
 		4886D0E91AC1EFAA00550CB5 /* MAS project.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MAS project.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4886D0ED1AC1EFAA00550CB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4886D0EE1AC1EFAA00550CB5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -62,7 +63,6 @@
 		4886D0FE1AC1EFAA00550CB5 /* MAS projectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "MAS projectTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4886D1031AC1EFAA00550CB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4886D1041AC1EFAA00550CB5 /* MAS_projectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MAS_projectTests.swift; sourceTree = "<group>"; };
-		4886D10E1AC1FD4400550CB5 /* GoogleMaps.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GoogleMaps.framework; path = "MAS project/GoogleMaps.framework"; sourceTree = "<group>"; };
 		4886D1101AC1FDE000550CB5 /* GoogleMaps.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = GoogleMaps.bundle; path = GoogleMaps.framework/Versions/A/Resources/GoogleMaps.bundle; sourceTree = "<group>"; };
 		4886D1401AC201A500550CB5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		4886D1421AC201AE00550CB5 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -94,10 +94,10 @@
 				4886D15D1AC2029500550CB5 /* ImageIO.framework in Frameworks */,
 				4886D15C1AC2028E00550CB5 /* GLKit.framework in Frameworks */,
 				4886D15B1AC2028600550CB5 /* CoreText.framework in Frameworks */,
+				482052E41AC27920002990D7 /* GoogleMaps.framework in Frameworks */,
 				4886D15A1AC2027F00550CB5 /* CoreLocation.framework in Frameworks */,
 				4886D1591AC2027900550CB5 /* CoreData.framework in Frameworks */,
 				4886D1581AC2026F00550CB5 /* AVFoundation.framework in Frameworks */,
-				4886D10F1AC1FD4400550CB5 /* GoogleMaps.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,6 +145,7 @@
 		4886D0EB1AC1EFAA00550CB5 /* MAS project */ = {
 			isa = PBXGroup;
 			children = (
+				4886D1661AC2056B00550CB5 /* MAS project-Bridging-Header.h */,
 				4886D1101AC1FDE000550CB5 /* GoogleMaps.bundle */,
 				4886D0EE1AC1EFAA00550CB5 /* AppDelegate.swift */,
 				4886D0F01AC1EFAA00550CB5 /* ViewController.swift */,
@@ -152,7 +153,6 @@
 				4886D0F51AC1EFAA00550CB5 /* Images.xcassets */,
 				4886D0F71AC1EFAA00550CB5 /* LaunchScreen.xib */,
 				4886D0EC1AC1EFAA00550CB5 /* Supporting Files */,
-				4886D1661AC2056B00550CB5 /* MAS project-Bridging-Header.h */,
 			);
 			path = "MAS project";
 			sourceTree = "<group>";
@@ -185,7 +185,7 @@
 		4886D1651AC2034800550CB5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				4886D10E1AC1FD4400550CB5 /* GoogleMaps.framework */,
+				482052E31AC27920002990D7 /* GoogleMaps.framework */,
 				4886D1401AC201A500550CB5 /* AVFoundation.framework */,
 				4886D14C1AC2020200550CB5 /* libc++.1.dylib */,
 				4886D14E1AC2020F00550CB5 /* libicucore.dylib */,
@@ -367,6 +367,12 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					MAS,
+					project,
+					MAS,
+					project/GoogleMaps.framework,
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -412,6 +418,12 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					MAS,
+					project,
+					MAS,
+					project/GoogleMaps.framework,
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -438,6 +450,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/MAS",
 					project,
+					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = "MAS project/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -457,6 +470,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/MAS",
 					project,
+					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = "MAS project/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
