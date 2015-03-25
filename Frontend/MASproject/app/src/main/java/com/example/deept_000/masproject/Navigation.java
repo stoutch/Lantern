@@ -20,6 +20,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
@@ -38,6 +40,7 @@ public class Navigation extends ActionBarActivity {
 
     GoogleMap googleMap;
     int selected_route;
+    ArrayList<LatLng> route;
     public static String serverURL = "http://173.236.254.243:8080/";
 
     @Override
@@ -45,6 +48,16 @@ public class Navigation extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
         selected_route = Integer.parseInt(getIntent().getStringExtra("selected_route"));
+        try {
+            Bundle bundle = getIntent().getExtras();
+            route = bundle.getParcelableArrayList("selected_route");
+            postSelectedRoute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         setUpMapIfNeeded();
     }
 
@@ -76,6 +89,11 @@ public class Navigation extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void postSelectedRoute()
+    {
+        return;
+    }
+
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         try {
@@ -88,6 +106,7 @@ public class Navigation extends ActionBarActivity {
                     googleMap.setMyLocationEnabled(true);
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 13));
                     addHeatMap();
+                    displayRoute();
                 }
             }
         } catch (Exception e) {
@@ -140,6 +159,15 @@ public class Navigation extends ActionBarActivity {
         }
         HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().data(list).radius(15).opacity(.5).build();
         TileOverlay overlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+    }
+
+    private void displayRoute()
+    {
+        PolylineOptions wayOptions = new PolylineOptions();
+        for(int i=0; i<route.size(); i++){
+            wayOptions.add(route.get(i));
+        }
+        Polyline myRoutes = googleMap.addPolyline(wayOptions);
     }
 
     private class AsyncPostData extends AsyncTask<String, Void, String> { // last variable: return value of doInBackground
