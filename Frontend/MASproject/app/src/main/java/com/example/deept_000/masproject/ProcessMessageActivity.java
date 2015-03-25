@@ -53,6 +53,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
     String xmlString;
     ArrayList wayPoints;
     LatLng current;
+    int selected_route_id;
     int selected_route;
 
     @Override
@@ -399,8 +400,10 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
     public void startNavigation(View view) {
         Intent intent = new Intent(this, Navigation.class);
-        String route = Integer.toString(selected_route);
-        intent.putExtra("selected_route", route);
+        String route_id = Integer.toString(selected_route_id);
+        intent.putExtra("selected_route_id", route_id);
+        ArrayList<LatLng> route = candidates.get(selected_route);
+        intent.putParcelableArrayListExtra("selected_route", route);
         startActivity(intent);
     }
 }
