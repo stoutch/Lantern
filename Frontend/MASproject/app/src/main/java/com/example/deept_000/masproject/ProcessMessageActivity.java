@@ -60,6 +60,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
     int selected_route;
     int best_score;
     int chosen_index;
+    String selected_route_string;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -401,16 +402,16 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
                 }
                 wayOptions.color(route_color);
                 mPolylines.add(wayOptions);
-                route_color = route_color + 50;
+                route_color = route_color + 500;
                 Polyline myRoutes = googleMap.addPolyline(wayOptions);
             }
             Log.e("mPolylines:", ""+mPolylines.size());
 
 
-            selected_route_id = 0;
             selected_route = 0;
             best_score = 0;
             chosen_index = route_indices.getInt(0);
+            selected_route_string = route_indices.getString(0);
             googleMap.setOnMapClickListener( new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng clickCoords) {
@@ -506,8 +507,9 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
     public void startNavigation(View view) {
         Intent intent = new Intent(this, Navigation.class);
-        String route_id = Integer.toString(selected_route_id);
-        intent.putExtra("selected_route_id", route_id);
+        //String route_id = Integer.toString(chosen_index);
+        Log.v("ProcessMessage selected route is ", selected_route_string);
+        intent.putExtra("selected_route_id", selected_route_string);
         ArrayList<LatLng> route = candidates.get(selected_route);
         intent.putParcelableArrayListExtra("selected_route", route);
         startActivity(intent);

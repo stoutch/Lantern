@@ -76,7 +76,7 @@ public class InitialMapActivity extends ActionBarActivity {
                 if (googleMap != null) {
                     LatLng tech = new LatLng(33.775635, -84.396444);
                     googleMap.setMyLocationEnabled(true);
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 13));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 15));
                     provider.addHeatmap(googleMap, getLastLocation());
                     //addHeatMap();
                 }

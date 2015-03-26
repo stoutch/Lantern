@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +36,9 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,10 +49,11 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class Navigation extends ActionBarActivity {
+public class Navigation extends ActionBarActivity implements AsyncResponse{
 
     GoogleMap googleMap;
     int selected_route;
+    String selected_route_string;
     ArrayList<LatLng> route;
     public static String serverURL = "http://173.236.254.243:8080/";
 
@@ -56,7 +61,15 @@ public class Navigation extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
-        selected_route = Integer.parseInt(getIntent().getStringExtra("selected_route"));
+        try {
+            //selected_route = Integer.parseInt(getIntent().getStringExtra("selected_route_id"));
+            selected_route_string = getIntent().getStringExtra("selected_route_id");
+            Log.v("Selected route string is ", selected_route_string);
+        }
+        catch(Exception e)
+        {
+            Log.v("Problem here", "i");
+        }
         try {
             Bundle bundle = getIntent().getExtras();
             route = bundle.getParcelableArrayList("selected_route");
@@ -97,6 +110,13 @@ public class Navigation extends ActionBarActivity {
     }
 
     private void postSelectedRoute() {
+        String url = serverURL + "routes/select/" + selected_route_string;
+        Log.v("Url is ", url);
+        AsyncPostData getJSON = new AsyncPostData();
+        getJSON.execute(url);
+        getJSON.delegate = this;
+//        HttpGetTask httpGet = new HttpGetTask();
+//        httpGet.execute(url);
         return;
     }
 
@@ -111,7 +131,7 @@ public class Navigation extends ActionBarActivity {
                 if (googleMap != null) {
                     LatLng tech = new LatLng(33.775635, -84.396444);
                     googleMap.setMyLocationEnabled(true);
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 13));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 15));
                     provider.addHeatmap(googleMap, getLastLocation());
                     //addHeatMap();
                     displayRoute();
@@ -190,6 +210,7 @@ public class Navigation extends ActionBarActivity {
                 HttpResponse httpResponse = httpClient.execute(httpPost);
                 HttpEntity httpEntity = httpResponse.getEntity();
                 result = EntityUtils.toString(httpEntity);
+                Log.v("Post response is ", result);
             } catch (Exception ex) {
                 Toast errorToast =
                         Toast.makeText(getApplicationContext(),
@@ -335,6 +356,7 @@ public class Navigation extends ActionBarActivity {
         protected void onPostExecute(HttpResponse response) {
             try {
                 System.out.println(readIt(response.getEntity().getContent(), 450));
+                Log.v("Post result is", readIt(response.getEntity().getContent(), 450));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -354,5 +376,22 @@ public class Navigation extends ActionBarActivity {
         Criteria criteria = new Criteria();
         String bestProvider = locationManager.getBestProvider(criteria, true);
         return locationManager.getLastKnownLocation(bestProvider);
+    }
+
+    public void processFinish(String output) {
+
+        Log.i("in processFinish:", output);
+        try {
+            JSONObject top = new JSONObject(output); // outer bracket
+            //JSONObject status_obj = top.getJSONObject(0);
+            String status = top.getString("success");
+            System.out.println("Post result is " + status);
+            Log.v("Post result is ", status);
+            if (status == "true") {
+                System.out.println("Success in selecting the route");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
