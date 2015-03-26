@@ -1,6 +1,7 @@
 package com.example.deept_000.masproject;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -23,6 +24,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
@@ -55,6 +58,8 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
     LatLng current;
     int selected_route_id;
     int selected_route;
+    int best_score;
+    int chosen_index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +75,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
         /* Start: */
         LatLng start = new LatLng(33.777482, -84.397300);
         /* Destination: */
-        LatLng dest = getLocationFromAddress(message);
+        LatLng dest = getLocationFromAddress(message); // 33.772579, -84.394822
 
         getDirections(start.latitude, start.longitude, dest.latitude, dest.longitude);
 
@@ -257,10 +262,21 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
 
         try {
-            String star = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781940) + ",\"lng\":" + String.valueOf(-84.376917) + "}", "UTF-8");
-//            String slng = URLEncoder.encode(String.valueOf(-84.396187), "UTF-8");
-            String dest = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781761) + ",\"lng\":" + String.valueOf(-84.405155) + "}", "UTF-8");
+
+////            String slng = URLEncoder.encode(String.valueOf(-84.396187), "UTF-8");
+
 //            String dlng = URLEncoder.encode(String.valueOf(-84.395426), "UTF-8");
+
+
+
+            // 33.772579, -84.394822
+//            String star = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781940) + ",\"lng\":" + String.valueOf(-84.376917) + "}", "UTF-8");
+            String star = URLEncoder.encode("{\"lat\":" + String.valueOf(33.777444) + ",\"lng\":" + String.valueOf(-84.397250) + "}", "UTF-8"); // coc 33.777444, -84.397250
+            String dest = URLEncoder.encode("{\"lat\":" + String.valueOf(lat2) + ",\"lng\":" + String.valueOf(lon2) + "}", "UTF-8"); // tech tower
+//            String dest = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781761) + ",\"lng\":" + String.valueOf(-84.405155) + "}", "UTF-8");
+
+//            String star = URLEncoder.encode("{\"lat\":" + String.valueOf(lat1) + ",\"lng\":" + String.valueOf(lon1) + "}", "UTF-8");
+//            String dest = URLEncoder.encode("{\"lat\":" + String.valueOf(lat2) + ",\"lng\":" + String.valueOf(lon2) + "}", "UTF-8");
 
             String routesHeatmapFromServer = "http://173.236.254.243:8080/routes?dest=" + dest + "&start=" + star;//{\"lat\":"+dlat+",\"lng\":"+dlng+"}&start={\"lat\":"+slat+",\"lng\":"+slng+"}";
 
@@ -326,36 +342,119 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
         try {
             JSONObject top = new JSONObject(output); // outer bracket
             JSONArray routes = top.getJSONObject("response").getJSONArray("routes");
+            final JSONArray scores = top.getJSONObject("response").getJSONArray("score");
+            JSONArray route_indices = top.getJSONObject("response").getJSONArray("route_index");
+
+//            googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+//                @Override
+//                public void onMapClick(LatLng clickCoords) {
+//                    for (PolylineOptions polyline : mPolylines) {
+//                        for (LatLng polyCoords : polyline.getPoints()) {
+//                            float[] results = new float[1];
+//                            Location.distanceBetween(clickCoords.latitude, clickCoords.longitude,
+//                                    polyCoords.latitude, polyCoords.longitude, results);
+//
+//                            if (results[0] < 100) {
+//                                // If distance is less than 100 meters, this is your polyline
+//                                Log.e("processFinish", "Found @ "+clickCoords.latitude+" "+clickCoords.longitude);
+//                            }
+//                        }
+//                    }
+//                }
+//            });
 
             candidates = new ArrayList<ArrayList<LatLng>>();
             for (int i = 0; i < routes.length(); ++i) {
                 JSONObject curr_route_total = routes.getJSONObject(i);
                 JSONArray legs = curr_route_total.getJSONArray("legs");
+                JSONArray steps = legs.getJSONObject(0).getJSONArray("steps"); // assume no waypoints
 
                 candidates.add(new ArrayList<LatLng>());
                 int candidates_tail = candidates.size() - 1;
 
-                for (int j = 0; j < legs.length(); ++j) {
-                    JSONObject curr_leg_total = legs.getJSONObject(j);
-                    JSONObject curr_leg_start = curr_leg_total.getJSONObject("start_location");
-                    JSONObject curr_leg_end = curr_leg_total.getJSONObject("end_location");
+                for (int j = 0; j < steps.length(); ++j) {
+                    JSONObject curr_step_total = steps.getJSONObject(j);
+                    JSONObject curr_step_start = curr_step_total.getJSONObject("start_location");
+                    JSONObject curr_step_end = curr_step_total.getJSONObject("end_location");
 
-                    double start_lat = curr_leg_start.getDouble("lat");
-                    double start_lng = curr_leg_start.getDouble("lng");
+                    double start_lat = curr_step_start.getDouble("lat");
+                    double start_lng = curr_step_start.getDouble("lng");
                     LatLng leg_start_latlng = new LatLng(start_lat, start_lng);
 
-                    double end_lat = curr_leg_end.getDouble("lat");
-                    double end_lng = curr_leg_end.getDouble("lng");
+                    double end_lat = curr_step_end.getDouble("lat");
+                    double end_lng = curr_step_end.getDouble("lng");
                     LatLng leg_end_latlng = new LatLng(end_lat, end_lng);
 
                     candidates.get(candidates_tail).add(leg_start_latlng);
                     candidates.get(candidates_tail).add(leg_end_latlng);
                 }
             }
-            if (output.contains("heatmap"))
-                Log.i("candidate count:", "" + candidates.size());
-            Log.i("route 1:", "" + candidates.get(0).size());
-            Log.i("route 2:", "" + candidates.get(1).size());
+
+            // render all routes:
+            int route_color = 0x8F000000;
+            final List<PolylineOptions> mPolylines = new ArrayList<PolylineOptions>();
+            for(int i=0; i<candidates.size(); ++i){ // for all routes
+                PolylineOptions wayOptions = new PolylineOptions();
+                ArrayList<LatLng> curr_route = candidates.get(i);
+                for(int j=0; j<curr_route.size(); ++j){ // each step in one route
+                    wayOptions.add(curr_route.get(j));
+                }
+                wayOptions.color(route_color);
+                mPolylines.add(wayOptions);
+                route_color = route_color + 50;
+                Polyline myRoutes = googleMap.addPolyline(wayOptions);
+            }
+            Log.e("mPolylines:", ""+mPolylines.size());
+
+
+            selected_route_id = 0;
+            selected_route = 0;
+            best_score = 0;
+            chosen_index = route_indices.getInt(0);
+            googleMap.setOnMapClickListener( new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng clickCoords) {
+                    boolean flag = true;
+                    for (PolylineOptions polyline : mPolylines) {
+
+                        for (LatLng polyCoords : polyline.getPoints()) {
+                            float[] results = new float[1];
+                            Location.distanceBetween(clickCoords.latitude, clickCoords.longitude,
+                                    polyCoords.latitude, polyCoords.longitude, results);
+
+                            if (results[0] < 100) {
+                                // If distance is less than 100 meters, this is your polyline
+                                Log.e("processFinish", "Found @ "+clickCoords.latitude+" "+clickCoords.longitude);
+                                //Log.e("processFinish", "mPolyline index:" + selected_route_id);
+                                if(flag) {
+                                    best_score = selected_route_id;
+                                    flag = false;
+                                }
+                                try {
+
+                                    if(scores.getDouble(selected_route_id)> scores.getDouble(best_score))
+                                        best_score = selected_route_id;
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+
+                            }
+                        }
+                        selected_route_id++;
+                    }
+                }
+            });
+
+            selected_route_id = best_score;
+            selected_route = best_score;
+            chosen_index = route_indices.getInt(best_score);
+
+            Log.e("id pick:", ""+selected_route_id);
+//            if (output.contains("heatmap"))
+//                Log.i("candidate count:", "" + candidates.size());
+//            Log.i("route 1:", "" + candidates.get(0).size());
+//            Log.i("route 2:", "" + candidates.get(1).size());
             //Log.i("route 3:", ""+candidates.get(2).size());
 
         } catch (JSONException e) {
