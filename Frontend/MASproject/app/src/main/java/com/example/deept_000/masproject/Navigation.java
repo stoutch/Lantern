@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -245,6 +246,7 @@ public class Navigation extends ActionBarActivity implements AsyncResponse{
                     }
                 });
         AlertDialog report_dialog = builder.create();
+
             /*
             LinearLayout lighting = (LinearLayout) report_dialog.findViewById(R.id.lighting_layout);
             lighting.setOnClickListener(new View.OnClickListener() {
@@ -276,21 +278,23 @@ public class Navigation extends ActionBarActivity implements AsyncResponse{
                 }
             });
             */
-        LinearLayout police_tower = (LinearLayout) report_dialog.findViewById(R.id.police_tower_layout);
-        police_tower.setOnClickListener(new View.OnClickListener() {
+
+        LinearLayout police_tower = (LinearLayout) findViewById(R.id.police_tower_layout);
+        /*police_tower.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //send police tower update to server
                 System.out.println("Clicked police tower");
             }
         });
-        LinearLayout road_closure = (LinearLayout) report_dialog.findViewById(R.id.police_station_layout);
+        LinearLayout road_closure = (LinearLayout) findViewById(R.id.police_station_layout);
         road_closure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //send road closure update to server
             }
         });
+        */
 
         report_dialog.show();
 
