@@ -27,9 +27,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.TileOverlay;
-import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -37,20 +34,17 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Random;
 
 
-public class Navigation extends ActionBarActivity implements AsyncResponse{
+public class Navigation extends ActionBarActivity implements AsyncResponse {
 
     GoogleMap googleMap;
     int selected_route;
@@ -65,10 +59,8 @@ public class Navigation extends ActionBarActivity implements AsyncResponse{
         try {
             //selected_route = Integer.parseInt(getIntent().getStringExtra("selected_route_id"));
             selected_route_string = getIntent().getStringExtra("selected_route_id");
-            Log.v("Selected route string is ", selected_route_string);
-        }
-        catch(Exception e)
-        {
+            Log.v("Navigation.onCreate", "Selected route string is " + selected_route_string);
+        } catch (Exception e) {
             Log.v("Problem here", "i");
         }
         try {
@@ -150,43 +142,6 @@ public class Navigation extends ActionBarActivity implements AsyncResponse{
                 //addHeatmap();
             }
         }
-    }
-
-    private void addHeatMap() {
-        ArrayList<LatLng> list = new ArrayList<LatLng>();
-        double minLat = 33.775238;
-        double minLong = -84.396663;
-        double maxLat = 33.776972;
-        double maxLong = -84.396744;
-        double randLat, randLong;
-        Random rand = new Random();
-        for (int i = 0; i < 15; i++) {
-            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
-            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
-            list.add(new LatLng(randLat, randLong));
-        }
-
-        minLat = 33.774016;
-        minLong = -84.398498;
-        maxLat = 33.773949;
-        maxLong = -84.394920;
-        for (int i = 0; i < 15; i++) {
-            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
-            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
-            list.add(new LatLng(randLat, randLong));
-        }
-
-        minLat = 33.774029;
-        minLong = -84.397876;
-        maxLat = 33.777775;
-        maxLong = -84.397811;
-        for (int i = 0; i < 15; i++) {
-            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
-            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
-            list.add(new LatLng(randLat, randLong));
-        }
-        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().data(list).radius(15).opacity(.5).build();
-        TileOverlay overlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
 
     private void displayRoute() {
@@ -314,7 +269,7 @@ public class Navigation extends ActionBarActivity implements AsyncResponse{
             public void onClick(View v) {
                 RatingBar rb = (RatingBar) dialog.findViewById(R.id.ratingBar);
                 int rating = (int) rb.getRating();
-                System.out.println("Clicked done, rating::: " + rating);
+                System.out.println("Clicked done, rating: " + rating);
                 dialog.dismiss();
                 sendRating(rating);
             }
@@ -358,21 +313,26 @@ public class Navigation extends ActionBarActivity implements AsyncResponse{
 
         @Override
         protected void onPostExecute(HttpResponse response) {
-            try {
-                System.out.println(readIt(response.getEntity().getContent(), 450));
-                Log.v("Post result is", readIt(response.getEntity().getContent(), 450));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            String result = httpResponseToString(response);
+            Log.v("onPostExecute", "Post result: " + result);
         }
     }
 
-    public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-        Reader reader = null;
-        reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[len];
-        reader.read(buffer);
-        return new String(buffer);
+    private String httpResponseToString(HttpResponse response) {
+        if (response == null || response.getEntity() == null)
+            return null;
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+            StringBuilder builder = new StringBuilder();
+            for (String line = null; (line = reader.readLine()) != null; ) {
+                builder.append(line).append("\n");
+            }
+            return builder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Location getLastLocation() {

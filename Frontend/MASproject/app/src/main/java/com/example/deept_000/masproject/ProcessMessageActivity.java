@@ -1,7 +1,6 @@
 package com.example.deept_000.masproject;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -26,9 +25,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.TileOverlay;
-import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -44,7 +40,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 
 public class ProcessMessageActivity extends ActionBarActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks,
@@ -173,43 +168,6 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
     }
 
-    private void addHeatMap() {
-        ArrayList<LatLng> list = new ArrayList<LatLng>();
-        double minLat = 33.775238;
-        double minLong = -84.396663;
-        double maxLat = 33.776972;
-        double maxLong = -84.396744;
-        double randLat, randLong;
-        Random rand = new Random();
-        for (int i = 0; i < 15; i++) {
-            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
-            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
-            list.add(new LatLng(randLat, randLong));
-        }
-
-        minLat = 33.774016;
-        minLong = -84.398498;
-        maxLat = 33.773949;
-        maxLong = -84.394920;
-        for (int i = 0; i < 15; i++) {
-            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
-            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
-            list.add(new LatLng(randLat, randLong));
-        }
-
-        minLat = 33.774029;
-        minLong = -84.397876;
-        maxLat = 33.777775;
-        maxLong = -84.397811;
-        for (int i = 0; i < 15; i++) {
-            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
-            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
-            list.add(new LatLng(randLat, randLong));
-        }
-        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().data(list).radius(15).opacity(.5).build();
-        TileOverlay overlay = googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -269,7 +227,6 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 //            String dlng = URLEncoder.encode(String.valueOf(-84.395426), "UTF-8");
 
 
-
             // 33.772579, -84.394822
 //            String star = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781940) + ",\"lng\":" + String.valueOf(-84.376917) + "}", "UTF-8");
             String star = URLEncoder.encode("{\"lat\":" + String.valueOf(33.777444) + ",\"lng\":" + String.valueOf(-84.397250) + "}", "UTF-8"); // coc 33.777444, -84.397250
@@ -320,12 +277,12 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpGet httpPost = new HttpGet(url);
 
-            Log.v("InitialMapActivity", "Post requested");
+            Log.v("ProcessMessageActivity", "Post requested");
             HttpResponse httpResponse = httpClient.execute(httpPost);
             HttpEntity httpEntity = httpResponse.getEntity();
-            Log.v("InitialMapActivity", "Parsing requested.");
+            Log.v("ProcessMessageActivity", "Parsing requested.");
             result = EntityUtils.toString(httpEntity);//EntityUtils.toString(httpEntity);
-            Log.v("InitialMapActivity", result);
+            Log.v("ProcessMessageActivity", result);
         } catch (Exception ex) {
             Toast errorToast =
                     Toast.makeText(getApplicationContext(),
@@ -394,10 +351,10 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
             // render all routes:
             int route_color = 0x8F000000;
             final List<PolylineOptions> mPolylines = new ArrayList<PolylineOptions>();
-            for(int i=0; i<candidates.size(); ++i){ // for all routes
+            for (int i = 0; i < candidates.size(); ++i) { // for all routes
                 PolylineOptions wayOptions = new PolylineOptions();
                 ArrayList<LatLng> curr_route = candidates.get(i);
-                for(int j=0; j<curr_route.size(); ++j){ // each step in one route
+                for (int j = 0; j < curr_route.size(); ++j) { // each step in one route
                     wayOptions.add(curr_route.get(j));
                 }
                 wayOptions.color(route_color);
@@ -405,14 +362,14 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
                 route_color = route_color + 500;
                 Polyline myRoutes = googleMap.addPolyline(wayOptions);
             }
-            Log.e("mPolylines:", ""+mPolylines.size());
+            Log.e("mPolylines:", "" + mPolylines.size());
 
 
             selected_route = 0;
             best_score = 0;
             chosen_index = route_indices.getInt(0);
             selected_route_string = route_indices.getString(0);
-            googleMap.setOnMapClickListener( new GoogleMap.OnMapClickListener() {
+            googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng clickCoords) {
                     boolean flag = true;
@@ -425,15 +382,15 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
                             if (results[0] < 100) {
                                 // If distance is less than 100 meters, this is your polyline
-                                Log.e("processFinish", "Found @ "+clickCoords.latitude+" "+clickCoords.longitude);
+                                Log.e("processFinish", "Found @ " + clickCoords.latitude + " " + clickCoords.longitude);
                                 //Log.e("processFinish", "mPolyline index:" + selected_route_id);
-                                if(flag) {
+                                if (flag) {
                                     best_score = selected_route_id;
                                     flag = false;
                                 }
                                 try {
 
-                                    if(scores.getDouble(selected_route_id)> scores.getDouble(best_score))
+                                    if (scores.getDouble(selected_route_id) > scores.getDouble(best_score))
                                         best_score = selected_route_id;
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -451,7 +408,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
             selected_route = best_score;
             chosen_index = route_indices.getInt(best_score);
 
-            Log.e("id pick:", ""+selected_route_id);
+            Log.e("id pick:", "" + selected_route_id);
 //            if (output.contains("heatmap"))
 //                Log.i("candidate count:", "" + candidates.size());
 //            Log.i("route 1:", "" + candidates.get(0).size());
@@ -508,7 +465,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
     public void startNavigation(View view) {
         Intent intent = new Intent(this, Navigation.class);
         //String route_id = Integer.toString(chosen_index);
-        Log.v("ProcessMessage selected route is ", selected_route_string);
+        Log.v("startNavigation", "PM selected route is " + selected_route_string);
         intent.putExtra("selected_route_id", selected_route_string);
         ArrayList<LatLng> route = candidates.get(selected_route);
         intent.putParcelableArrayListExtra("selected_route", route);
