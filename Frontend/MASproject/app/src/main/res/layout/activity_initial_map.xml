@@ -1,68 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".StartActivity">
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".StartActivity">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/map"
+        android:name="com.google.android.gms.maps.MapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:name="com.google.android.gms.maps.MapFragment"/>
+        android:layout_height="match_parent" />
 
-    <TextView
-        android:layout_width="300dp"
-        android:layout_height="40dp"
-        android:text="Select Destination"
-        android:id="@+id/textView"
-        android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginBottom="75dp"
-        android:gravity="center"
-        android:background="#ff5a5399"
-        android:textColor="#ffffffff"
-        android:textSize="14dp" />
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_gravity="bottom|right"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        fab:fab_addButtonColorNormal="@color/purple"
+        fab:fab_addButtonColorPressed="@color/light_purple"
+        fab:fab_addButtonPlusIconColor="@color/white"
+        fab:fab_addButtonSize="normal"
+        fab:fab_expandDirection="up"
+        fab:fab_labelStyle="@style/menu_labels_style"
+        fab:fab_labelsPosition="left">
 
-    <LinearLayout
-        android:layout_width="300dp"
-        android:layout_height="40dp"
-        android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginBottom="30dp">
-
-
-        <EditText
-            android:layout_width="250dp"
-            android:layout_height="fill_parent"
-            android:layout_alignParentLeft="true"
-            android:inputType="textPostalAddress"
-            android:ems="10"
-            android:id="@+id/editText"
-            android:layout_weight="1.85"
-            android:gravity="center"
-            android:background="#ffffffff"
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:onClick="inputDestination"
-            android:clickable="true"
-            android:hint="Search for address or tap on the map"
-            android:textColorHint="#ff909090"
-            android:textSize="13dp" />
+            fab:fab_colorNormal="@color/pink"
+            fab:fab_colorPressed="@color/pink_pressed"
+            fab:fab_icon="@drawable/ic_navigation_white"
+            fab:fab_size="mini"
+            fab:fab_title="Navigate" />
 
-        <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:id="@+id/imageButton"
-            android:layout_weight="2.29"
-            android:maxWidth="10dp"
-            android:clickable="true"
-            android:adjustViewBounds="true"
-            android:src="@drawable/search_button"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:onClick="inputDestination"
-            android:background="#ffffffff" />
-    </LinearLayout>
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="reportConditions"
+            fab:fab_colorNormal="@color/pink"
+            fab:fab_colorPressed="@color/pink_pressed"
+            fab:fab_icon="@drawable/ic_create_white"
+            fab:fab_size="mini"
+            fab:fab_title="Report" />
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+    <!--<com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"-->
+    <!--android:id="@+id/fab"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="bottom|right"-->
+    <!--android:layout_margin="16dp"-->
+    <!--fab:fab_colorNormal="@color/primary"-->
+    <!--fab:fab_colorPressed="@color/primary_pressed"-->
+    <!--fab:fab_colorRipple="@color/ripple" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/textView"-->
+    <!--android:layout_width="300dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:layout_gravity="center_horizontal|bottom"-->
+    <!--android:layout_marginBottom="75dp"-->
+    <!--android:background="#ff5a5399"-->
+    <!--android:gravity="center"-->
+    <!--android:text="Select Destination"-->
+    <!--android:textColor="#ffffffff"-->
+    <!--android:textSize="14dp" />-->
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="300dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:layout_gravity="center_horizontal|bottom"-->
+    <!--android:layout_marginBottom="30dp">-->
 
 
+    <!--<EditText-->
+    <!--android:id="@+id/editText"-->
+    <!--android:layout_width="250dp"-->
+    <!--android:layout_height="fill_parent"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_weight="1.85"-->
+    <!--android:background="#ffffffff"-->
+    <!--android:clickable="true"-->
+    <!--android:ems="10"-->
+    <!--android:gravity="center"-->
+    <!--android:hint="Search for address or tap on the map"-->
+    <!--android:inputType="textPostalAddress"-->
+    <!--android:onClick="inputDestination"-->
+    <!--android:textColorHint="#ff909090"-->
+    <!--android:textSize="13dp" />-->
+
+    <!--<ImageButton-->
+    <!--android:id="@+id/imageButton"-->
+    <!--android:layout_width="40dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_weight="2.29"-->
+    <!--android:adjustViewBounds="true"-->
+    <!--android:background="#ffffffff"-->
+    <!--android:clickable="true"-->
+    <!--android:maxWidth="10dp"-->
+    <!--android:onClick="inputDestination"-->
+    <!--android:padding="8dp"-->
+    <!--android:scaleType="fitCenter"-->
+    <!--android:src="@drawable/search_button" />-->
+    <!--</LinearLayout>-->
 
 
 </FrameLayout>

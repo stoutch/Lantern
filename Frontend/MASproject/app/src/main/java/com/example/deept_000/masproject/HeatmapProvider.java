@@ -1,25 +1,19 @@
 package com.example.deept_000.masproject;
 
+import android.graphics.Color;
 import android.location.Location;
-import android.os.AsyncTask;
 
 import com.example.deept_000.masproject.Gson.Heatmap;
+import com.example.deept_000.masproject.web.HttpSender;
+import com.example.deept_000.masproject.web.WebResponseListener;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.gson.Gson;
+import com.google.maps.android.heatmaps.Gradient;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.google.maps.android.heatmaps.WeightedLatLng;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -32,6 +26,10 @@ public class HeatmapProvider {
     private final int RADIUS = 15;
     private final double OPACITY = .5;
     private GoogleMap mGoogleMap;
+    private HttpSender mSender;
+    private double mLat;
+    private double mLong;
+    private final int MAP_RADIUS = 2500;
 
     /**
      * Adds a heatmap to the map
@@ -41,60 +39,76 @@ public class HeatmapProvider {
      */
     public void addHeatmap(GoogleMap googleMap, Location location) {
         mGoogleMap = googleMap;
+        mSender = new HttpSender();
+        mLat = location.getLatitude();
+        mLong = location.getLongitude();
+
         if (dumb) {
             addHeatMapDumb(googleMap);
             return;
         }
-        getHeatmapFromServer(googleMap, location);
+        getPositiveHeatmapFromServer();
+        getNegativeHeatmapFromServer();
     }
 
     /**
      * Formulates the HTTP query for the server using our REST API guideline
-     *
-     * @param googleMap The map to which the heatmap will be added
-     * @param location  The user's location
      */
-    private void getHeatmapFromServer(GoogleMap googleMap, Location location) {
-        // GET
-        double lat = location.getLatitude();//32.725371;
-        double lng = location.getLongitude();//-117.160721;
-        int radius = 2500;
-        String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&radius=%d", ADDRESS, lat, lng, radius);
-        HttpGetTask httpGet = new HttpGetTask();
-        httpGet.execute(uri);
+    private void getPositiveHeatmapFromServer() {
+        String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&radius=%d", ADDRESS, mLat, mLong, MAP_RADIUS);
+        mSender.sendHttpRequest(uri, null, "GET", new WebResponseListener() {
+            @Override
+            public void OnSuccess(String response, String... params) {
+                onSuccessfulResponse(response, true);
+            }
+
+            @Override
+            public void OnError(Exception e, String... params) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void OnProcessing() {
+                // figure out how to show a spinner
+            }
+        });
     }
 
     /**
-     * Asynchronously carry out the HttpGet query
+     * Formulates the HTTP query for the server using our REST API guideline
      */
-    private class HttpGetTask extends AsyncTask<String, Integer, HttpResponse> {
+    private void getNegativeHeatmapFromServer() {
+        // GET
+        String uri = String.format("%s/heatmaps/negative?lat=%f&lng=%f&radius=%d", ADDRESS, mLat, mLong, MAP_RADIUS);
+        mSender.sendHttpRequest(uri, null, "GET", new WebResponseListener() {
+            @Override
+            public void OnSuccess(String response, String... params) {
+                onSuccessfulResponse(response, true);
+            }
 
-        @Override
-        protected HttpResponse doInBackground(String... params) {
-            try {
-                HttpGet httpGet = new HttpGet(params[0]);
-                System.out.println(params[0]);
-                httpGet.setHeader("Accept", "application/json");
-                httpGet.setHeader("Content-type", "application/json");
-                return new DefaultHttpClient().execute(httpGet);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            @Override
+            public void OnError(Exception e, String... params) {
                 e.printStackTrace();
             }
-            return null;
-        }
 
-        @Override
-        protected void onPostExecute(HttpResponse response) {
-            String json = httpResponseToString(response);
-            System.out.println(json);
-            Gson gson = new Gson();
-            Heatmap heatmap = gson.fromJson(json, Heatmap.class);
+            @Override
+            public void OnProcessing() {
+                // figure out how to show a spinner
+            }
+        });
+    }
+
+    private void onSuccessfulResponse(String response, boolean isPositive) {
+        Gson gson = new Gson();
+        Heatmap heatmap = gson.fromJson(response, Heatmap.class);
+        if (heatmap != null) {
+            heatmap.positive = isPositive;
+        }
+        if (heatmap != null && heatmap.success && heatmap.response != null) {
             System.out.println(heatmap.toString());
             addPointsToMapWithWeight(heatmap);
+        } else {
+            System.out.println("Heatmap object is null");
         }
     }
 
@@ -110,31 +124,21 @@ public class HeatmapProvider {
             list.add(new WeightedLatLng(new LatLng(response.loc.coordinates[1], response.loc.coordinates[0]), weight));
             System.out.println("Adding " + response.loc.coordinates[1] + ", " + response.loc.coordinates[0] + ": " + weight);
         }
-        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().weightedData(list).radius(RADIUS).opacity(OPACITY).build();
-        mGoogleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-    }
-
-    /**
-     * Utility to convert an HttpResponse object's payload to a string
-     *
-     * @param response The HttpResponse to convert
-     * @return The string representation of the payload.
-     */
-    private String httpResponseToString(HttpResponse response) {
-        if (response == null || response.getEntity() == null)
-            return null;
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
-            StringBuilder builder = new StringBuilder();
-            for (String line = null; (line = reader.readLine()) != null; ) {
-                builder.append(line).append("\n");
-            }
-            return builder.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
+        HeatmapTileProvider mProvider;
+        if (heatmap.positive) {
+            mProvider = new HeatmapTileProvider.Builder().weightedData(list).radius(RADIUS).opacity(OPACITY).build();
+        } else {
+            int[] colors = {
+                    Color.rgb(0, 235, 255), // blue
+                    Color.rgb(175, 0, 255)  // violet
+            };
+            float[] startPoints = {
+                    0.2f, 1f
+            };
+            Gradient gradient = new Gradient(colors, startPoints);
+            mProvider = new HeatmapTileProvider.Builder().weightedData(list).radius(RADIUS).opacity(OPACITY).gradient(gradient).build();
         }
-        return null;
+        mGoogleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
     }
 
     /**

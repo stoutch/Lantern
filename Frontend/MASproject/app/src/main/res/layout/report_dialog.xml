@@ -1,108 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
+    android:id="@+id/report_dialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:id="@+id/report_dialog">
+    android:orientation="vertical">
 
     <TextView
+        android:id="@+id/tvRatings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:singleLine="true"
+        android:text="Report"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#ff5a5399" />
+
+    <TextView
+        android:id="@+id/tvLight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/report_dialog_title"
-        android:id="@+id/textView2"
+        android:layout_margin="15dp"
+        android:background="@color/purple"
         android:gravity="center"
-        android:textSize="20dp"
-        android:layout_marginBottom="10dp" />
-    <LinearLayout
-        android:orientation="vertical"
+        android:padding="10dp"
+        android:text="Lighting"
+        android:textColor="@color/white"
+        android:textSize="20dp" />
+
+    <!--android:background="@color/purple"-->
+    <TextView
+        android:id="@+id/tvPolicePresence"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:background="#fff0f0f0"
-            android:id="@+id/lighting_layout">
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@color/purple"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="Police Presence"
+        android:textColor="@color/white"
+        android:textSize="20dp" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:background="#ffd5d5d5" />
 
-                android:id="@+id/imageView"
-                android:src="@drawable/clipboard"
-                android:maxHeight="30dp"
-                android:adjustViewBounds="true"
-                android:paddingLeft="20dp"
-                android:paddingRight="40dp"/>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="Bad lighting"
-                android:id="@+id/lighting"
-                android:background="#fff0f0f0"
-                android:layout_weight="50"
-                android:textColor="#ff7f7f7f"
-                android:gravity="left|center_vertical" />
+    <TextView
+        android:id="@+id/tvCancelReport"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Cancel"
+        android:textColor="@color/pink_pressed" />
 
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:id="@+id/police_tower_layout">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-
-                android:id="@+id/imageView2"
-                android:src="@drawable/clipboard"
-                android:maxHeight="30dp"
-                android:adjustViewBounds="true"
-                android:paddingLeft="20dp"
-                android:paddingRight="40dp"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="Police tower"
-                android:id="@+id/police_tower"
-                android:background="#fff0f0f0"
-                android:layout_weight="50"
-                android:textColor="#ff7f7f7f"
-                android:gravity="left|center_vertical" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:id="@+id/police_station_layout">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-
-                    android:id="@+id/imageView3"
-                    android:src="@drawable/clipboard"
-                    android:maxHeight="30dp"
-                    android:adjustViewBounds="true"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="40dp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:text="Police station"
-                    android:id="@+id/closure"
-                    android:background="#fff0f0f0"
-                    android:layout_weight="50"
-                    android:textColor="#ff7f7f7f"
-                    android:gravity="left|center_vertical"/>
-
-            </LinearLayout>
-    </LinearLayout>
-
+    <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+    <!--android:layout_margin="6dp"-->
+    <!--android:padding="9dp"-->
 </LinearLayout>

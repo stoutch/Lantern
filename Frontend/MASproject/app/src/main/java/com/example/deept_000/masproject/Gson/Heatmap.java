@@ -4,8 +4,9 @@ package com.example.deept_000.masproject.Gson;
  * Created by Chris on 3/25/2015.
  */
 public class Heatmap {
-    private boolean success;
+    public boolean success;
     public Response[] response;
+    public boolean positive;
 
     public class Response {
         public Loc loc;
@@ -24,6 +25,9 @@ public class Heatmap {
     public String toString() {
         String result = "";
         result += "success: " + success + "\n";
+        if (response == null) {
+            return result;
+        }
         for (Response r : response) {
             result += "loc: " + r.loc + "\n";
             result += "weight: " + r.weight + "\n";

@@ -1,25 +1,33 @@
 package com.example.deept_000.masproject;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.TileOverlayOptions;
-import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
-import java.util.ArrayList;
-import java.util.Random;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 //import android.content.Intent;
 
@@ -29,6 +37,7 @@ import java.util.Random;
 public class InitialMapActivity extends ActionBarActivity {
 
     GoogleMap googleMap;
+    private final String ADDRESS = "http://173.236.254.243:8080";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,46 +104,60 @@ public class InitialMapActivity extends ActionBarActivity {
         }
     }
 
-    private void addHeatMap() {
-        ArrayList<LatLng> list = new ArrayList<LatLng>();
-        double minLat = 33.775238;
-        double minLong = -84.396663;
-        double maxLat = 33.776972;
-        double maxLong = -84.396744;
-        double randLat, randLong;
-        Random rand = new Random();
-        for (int i = 0; i < 15; i++) {
-            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
-            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
-            list.add(new LatLng(randLat, randLong));
-        }
-
-        minLat = 33.774016;
-        minLong = -84.398498;
-        maxLat = 33.773949;
-        maxLong = -84.394920;
-        for (int i = 0; i < 15; i++) {
-            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
-            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
-            list.add(new LatLng(randLat, randLong));
-        }
-
-        minLat = 33.774029;
-        minLong = -84.397876;
-        maxLat = 33.777775;
-        maxLong = -84.397811;
-        for (int i = 0; i < 15; i++) {
-            randLat = rand.nextDouble() * (maxLat - minLat) + minLat;
-            randLong = rand.nextDouble() * (maxLong - minLong) + minLong;
-            list.add(new LatLng(randLat, randLong));
-        }
-        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().data(list).radius(15).opacity(.5).build();
-        googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-    }
-
     public void inputDestination(View view) {
         Intent intent = new Intent(this, InputActivity.class);
         startActivity(intent);
+    }
+
+    public void reportConditions(View view) {
+        final Dialog dialog = new Dialog(InitialMapActivity.this);
+        dialog.setContentView(R.layout.report_dialog);
+        TextView lighting = (TextView) dialog.findViewById(R.id.tvLight);
+        lighting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("Reported lighting conditions");
+                dialog.dismiss();
+                sendLightRating();
+            }
+        });
+        TextView police = (TextView) dialog.findViewById(R.id.tvPolicePresence);
+        police.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("Reported police");
+                dialog.dismiss();
+                sendPoliceRating();
+            }
+        });
+        TextView cancel = (TextView) dialog.findViewById(R.id.tvCancelReport);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void sendLightRating() {
+        Location location = getLastLocation();
+        double lat = location.getLatitude();
+        double lng = location.getLongitude();
+        int radius = 2500;
+        String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&type=lighting&value=10", ADDRESS, lat, lng);
+        HttpPostTask httpPostTask = new HttpPostTask();
+        httpPostTask.execute(uri);
+    }
+
+    private void sendPoliceRating() {
+        Location location = getLastLocation();
+        double lat = location.getLatitude();
+        double lng = location.getLongitude();
+        int radius = 2500;
+        String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&type=police_tower&value=10", ADDRESS, lat, lng);
+        HttpPostTask httpPostTask = new HttpPostTask();
+        httpPostTask.execute(uri);
     }
 
     public Location getLastLocation() {
@@ -142,5 +165,49 @@ public class InitialMapActivity extends ActionBarActivity {
         Criteria criteria = new Criteria();
         String bestProvider = locationManager.getBestProvider(criteria, true);
         return locationManager.getLastKnownLocation(bestProvider);
+    }
+
+    private class HttpPostTask extends AsyncTask<String, Integer, HttpResponse> {
+
+        @Override
+        protected HttpResponse doInBackground(String... params) {
+            try {
+                HttpPost httpPost = new HttpPost(params[0]);
+                httpPost.setHeader("Accept", "application/json");
+                httpPost.setHeader("Content-type", "application/json");
+                HttpResponse response = new DefaultHttpClient().execute(httpPost);
+                String json = httpResponseToString(response);
+                System.out.println("HttpPost response: " + json);
+                return null;
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(HttpResponse response) {
+        }
+    }
+
+    private String httpResponseToString(HttpResponse response) {
+        if (response == null || response.getEntity() == null)
+            return null;
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+            StringBuilder builder = new StringBuilder();
+            for (String line = null; (line = reader.readLine()) != null; ) {
+                builder.append(line).append("\n");
+            }
+            return builder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

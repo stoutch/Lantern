@@ -14,8 +14,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +30,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
@@ -46,6 +45,7 @@ import java.util.ArrayList;
 
 public class Navigation extends ActionBarActivity implements AsyncResponse {
 
+    private final String ADDRESS = "http://173.236.254.243:8080";
     GoogleMap googleMap;
     int selected_route;
     String selected_route_string;
@@ -234,7 +234,7 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
             });
             */
 
-        LinearLayout police_tower = (LinearLayout) findViewById(R.id.police_tower_layout);
+        //LinearLayout police_tower = (LinearLayout) findViewById(R.id.police_tower_layout);
         /*police_tower.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -256,10 +256,86 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
     }
     // This is the function called on clicking the End button
 
+    public void reportConditions(View view) {
+        final Dialog dialog = new Dialog(Navigation.this);
+        dialog.setContentView(R.layout.report_dialog);
+        TextView lighting = (TextView) dialog.findViewById(R.id.tvLight);
+        lighting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("Reported lighting conditions");
+                dialog.dismiss();
+                sendLightRating();
+            }
+        });
+        TextView police = (TextView) dialog.findViewById(R.id.tvPolicePresence);
+        police.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("Reported police");
+                dialog.dismiss();
+                sendPoliceRating();
+            }
+        });
+        TextView cancel = (TextView) dialog.findViewById(R.id.tvCancelReport);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    private void sendLightRating() {
+        Location location = getLastLocation();
+        double lat = location.getLatitude();
+        double lng = location.getLongitude();
+        int radius = 2500;
+        String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&type=lighting&value=10", ADDRESS, lat, lng);
+        HttpPostTask httpPostTask = new HttpPostTask();
+        httpPostTask.execute(uri);
+    }
+
+
+    private void sendPoliceRating() {
+        Location location = getLastLocation();
+        double lat = location.getLatitude();
+        double lng = location.getLongitude();
+        int radius = 2500;
+        String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&type=police_tower&value=10", ADDRESS, lat, lng);
+        HttpPostTask httpPostTask = new HttpPostTask();
+        httpPostTask.execute(uri);
+    }
+
+    private class HttpPostTask extends AsyncTask<String, Integer, HttpResponse> {
+
+        @Override
+        protected HttpResponse doInBackground(String... params) {
+            try {
+                HttpPost httpPost = new HttpPost(params[0]);
+                httpPost.setHeader("Accept", "application/json");
+                httpPost.setHeader("Content-type", "application/json");
+                HttpResponse response = new DefaultHttpClient().execute(httpPost);
+                String json = httpResponseToString(response);
+                System.out.println("HttpPost response: " + json);
+                return null;
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(HttpResponse response) {
+        }
+    }
+
     public void endNavigation(View view) {
-//        Intent intent = new Intent(this, RatingActivity.class);
-//        intent.putExtra("selected_route", selected_route);
-//        startActivity(intent);
         final Dialog dialog = new Dialog(Navigation.this);
         dialog.setContentView(R.layout.ratings_layout);
         // if done get the rating
