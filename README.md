@@ -138,6 +138,34 @@ A response of a score of zero, could mean two things:
 1. There is not rating in the route and there are no persons around. 
 2. The rating of the place could mean is bad and the good elements are equal to the bad elements. This is highly unlike, so we can assume normally number 1.
 
+## Creating Users
+### POST
+Add a new user to the database. In the frontend we could verify that the user email has the for of *@gatech.edu to try to improve the security at least a little.
+
+#### Query template
+http://173.236.254.243:8080/users?email=<user email>&password=<user password>
+
+#### Example
+http://173.236.254.243:8080/users?email=esaurez@gatech.edu&password=test123
+
+### GET
+Get the information about the user, the user has to be log in to be able to use it. It does not require any parameter
+
+### PUT
+It can be used to change the password of the user, has to be logged in
+
+#### Query template
+http://173.236.254.243:8080/users?password=<new password>
+
+#### Query example
+http://173.236.254.243:8080/users?password=test123
+
+## Login
+
+
+###Query template
+http://173.236.254.243:8080/users
+
 ## References 
 
 Routes API:
