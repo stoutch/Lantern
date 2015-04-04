@@ -151,6 +151,9 @@ http://173.236.254.243:8080/users?email=esaurez@gatech.edu&password=test123
 ### GET
 Get the information about the user, the user has to be log in to be able to use it. It does not require any parameter
 
+###Query template
+http://173.236.254.243:8080/users
+
 ### PUT
 It can be used to change the password of the user, has to be logged in
 
@@ -161,10 +164,26 @@ http://173.236.254.243:8080/users?password=<new password>
 http://173.236.254.243:8080/users?password=test123
 
 ## Login
+This is use to login the users, it only supports post. After the user log in, it is required to store the cookie and send it with every other query to the server. (This is not required now, but when everybody enables it in both iOS and Android, I will enforce it on the server).
+
+### POST
+This function is used to log in an user.
+
+### Query Template
+http://173.236.254.243:8080/login?login=<user email>&password=<password>
+
+### Query example
+http://173.236.254.243:8080/login?login=esaurez@gatech.edu&password=test123
+
+## Logout
+This function logouts the user from the server. It only support get
+### GET
+This function log out the user from the server
+
+####Query Template and Example
+http://173.236.254.243:8080/logout
 
 
-###Query template
-http://173.236.254.243:8080/users
 
 ## References 
 
