@@ -148,6 +148,13 @@ http://173.236.254.243:8080/users?email=<user email>&password=<user password>
 #### Example
 http://173.236.254.243:8080/users?email=esaurez@gatech.edu&password=test123
 
+#### Query response
+If the query was done succesfully:
+{"response": {"$oid": "5520818ffc64c64a700e69a5"}, "success": true}
+
+If the user already exists or there was any other issue:
+{"success": false}
+
 ### GET
 Get the information about the user, the user has to be log in to be able to use it. It does not require any parameter
 
@@ -172,8 +179,11 @@ This function is used to log in an user.
 ### Query Template
 http://173.236.254.243:8080/login?login=<user email>&password=<password>
 
-### Query example
+### Query example (You can use this user as a default one for testing purposes)
 http://173.236.254.243:8080/login?login=esaurez@gatech.edu&password=test123
+
+### Query response
+{"response": {"user_status": true, "_id": {"$oid": "55205c01fc64c646c3be1ff5"}, "email": "esaurez@gatech.edu"}, "success": true}
 
 ## Logout
 This function logouts the user from the server. It only support get
@@ -183,7 +193,30 @@ This function log out the user from the server
 ####Query Template and Example
 http://173.236.254.243:8080/logout
 
+#### Query response
+{"success": true}
 
+## Rating a route
+This is use for rating a route, it only supports POST queries.
+
+###POST
+
+#### Query template
+http://173.236.254.243:8080/routes/rate/<route index>?rating=<value>&day=<true or false>
+* route index: is the index that the user obtained from the get route
+* rating: is the value from -10 to 10 that the user gave to the route. 0 stars should be mapped to -10 and 5 stars should be mapped to 10
+* day: is a value that is either true or false depending of the hour of the day.
+* 
+#### Query example
+http://173.236.254.243:8080/routes/rate/1428192333326?rating=10&day=true
+
+#### Query respones example
+It can be either 
+{"success": true}
+If there was at least one value associated to the route in the server
+or false
+{"success": false}
+This can happens if the route given does not exists, or was not the one selected previously.
 
 ## References 
 
