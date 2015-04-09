@@ -12,43 +12,111 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.getbase.floatingactionbutton.FloatingActionsMenu
+    <com.quinny898.library.persistentsearch.SearchBox
+        android:id="@+id/searchbox"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="bottom|right"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        fab:fab_addButtonColorNormal="@color/purple"
-        fab:fab_addButtonColorPressed="@color/light_purple"
-        fab:fab_addButtonPlusIconColor="@color/white"
-        fab:fab_addButtonSize="normal"
-        fab:fab_expandDirection="up"
-        fab:fab_labelStyle="@style/menu_labels_style"
-        fab:fab_labelsPosition="left">
+        android:gravity="bottom|right"
+        android:orientation="vertical">
+
+        <com.getbase.floatingactionbutton.FloatingActionsMenu
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="bottom|right"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            fab:fab_addButtonColorNormal="@color/purple"
+            fab:fab_addButtonColorPressed="@color/light_purple"
+            fab:fab_addButtonPlusIconColor="@color/white"
+            fab:fab_addButtonSize="normal"
+            fab:fab_expandDirection="up"
+            fab:fab_labelStyle="@style/menu_labels_style"
+            fab:fab_labelsPosition="left">
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="inputDestination"
+                fab:fab_colorNormal="@color/pink"
+                fab:fab_colorPressed="@color/pink_pressed"
+                fab:fab_icon="@drawable/ic_navigation_white"
+                fab:fab_size="mini"
+                fab:fab_title="Navigate" />
+
+            <com.getbase.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="reportConditions"
+                fab:fab_colorNormal="@color/pink"
+                fab:fab_colorPressed="@color/pink_pressed"
+                fab:fab_icon="@drawable/ic_create_white"
+                fab:fab_size="mini"
+                fab:fab_title="Report" />
+
+        </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="inputDestination"
-            fab:fab_colorNormal="@color/pink"
-            fab:fab_colorPressed="@color/pink_pressed"
-            fab:fab_icon="@drawable/ic_navigation_white"
-            fab:fab_size="mini"
-            fab:fab_title="Navigate" />
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="bottom|right"
+            fab:fab_colorNormal="@color/red"/>
+    </LinearLayout>
+    <!--<com.getbase.floatingactionbutton.FloatingActionsMenu-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_alignParentStart="true"-->
+    <!--android:layout_gravity="bottom|right"-->
+    <!--android:layout_marginLeft="16dp"-->
+    <!--android:layout_marginStart="16dp"-->
+    <!--fab:fab_addButtonColorNormal="@color/purple"-->
+    <!--fab:fab_addButtonColorPressed="@color/light_purple"-->
+    <!--fab:fab_addButtonPlusIconColor="@color/white"-->
+    <!--fab:fab_addButtonSize="normal"-->
+    <!--fab:fab_expandDirection="up"-->
+    <!--fab:fab_labelStyle="@style/menu_labels_style"-->
+    <!--fab:fab_labelsPosition="left">-->
 
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="reportConditions"
-            fab:fab_colorNormal="@color/pink"
-            fab:fab_colorPressed="@color/pink_pressed"
-            fab:fab_icon="@drawable/ic_create_white"
-            fab:fab_size="mini"
-            fab:fab_title="Report" />
+    <!--<com.getbase.floatingactionbutton.FloatingActionButton-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:onClick="inputDestination"-->
+    <!--fab:fab_colorNormal="@color/pink"-->
+    <!--fab:fab_colorPressed="@color/pink_pressed"-->
+    <!--fab:fab_icon="@drawable/ic_navigation_white"-->
+    <!--fab:fab_size="mini"-->
+    <!--fab:fab_title="Navigate" />-->
 
-    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+    <!--<com.getbase.floatingactionbutton.FloatingActionButton-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:onClick="reportConditions"-->
+    <!--fab:fab_colorNormal="@color/pink"-->
+    <!--fab:fab_colorPressed="@color/pink_pressed"-->
+    <!--fab:fab_icon="@drawable/ic_create_white"-->
+    <!--fab:fab_size="mini"-->
+    <!--fab:fab_title="Report" />-->
+
+    <!--</com.getbase.floatingactionbutton.FloatingActionsMenu>-->
+
+    <!--<com.getbase.floatingactionbutton.FloatingActionButton-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:layout_gravity="bottom|right"-->
+    <!--android:layout_marginBottom="16dp"-->
+    <!--android:text="SOS"-->
+    <!--fab:fab_colorNormal="@color/red" />-->
+
+
     <!--<com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"-->
     <!--android:id="@+id/fab"-->
     <!--android:layout_width="wrap_content"-->

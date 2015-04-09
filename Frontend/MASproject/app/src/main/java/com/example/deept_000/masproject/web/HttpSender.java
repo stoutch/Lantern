@@ -44,7 +44,6 @@ public class HttpSender {
             Exception ex = null;
             try {
                 HttpGet httpGet = new HttpGet(params[0]);
-                System.out.println(params[0]);
                 httpGet.setHeader("Accept", "application/json");
                 httpGet.setHeader("Content-type", "application/json");
                 HttpResponse response = new DefaultHttpClient().execute(httpGet);

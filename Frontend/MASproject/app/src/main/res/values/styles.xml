@@ -4,8 +4,24 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
     </style>
+
     <style name="menu_labels_style">
         <item name="android:background">@drawable/fab_label_background</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="route_label_a">
+        <item name="android:background">@drawable/floating_label_background_a</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="route_label_b">
+        <item name="android:background">@drawable/floating_label_background_b</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="route_label_c">
+        <item name="android:background">@drawable/floating_label_background_c</item>
         <item name="android:textColor">@color/white</item>
     </style>
 </resources>

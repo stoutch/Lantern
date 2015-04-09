@@ -1,5 +1,6 @@
 package com.example.deept_000.masproject;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -8,7 +9,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,7 +21,6 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -43,7 +42,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 
-public class Navigation extends ActionBarActivity implements AsyncResponse {
+public class Navigation extends Activity implements AsyncResponse {
 
     private final String ADDRESS = "http://173.236.254.243:8080";
     GoogleMap googleMap;
@@ -135,7 +134,7 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
         }
         if (googleMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+            googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
             // Check if we were successful in obtaining the map.
             if (googleMap != null) {
                 provider.addHeatmap(googleMap, getLastLocation());
@@ -278,7 +277,7 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
             }
         });
         TextView cancel = (TextView) dialog.findViewById(R.id.tvCancelReport);
-        cancel.setOnClickListener(new View.OnClickListener() {
+        police.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();

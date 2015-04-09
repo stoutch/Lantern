@@ -3,30 +3,85 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.example.deept_000.masproject.ProcessMessageActivity">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/map"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.google.android.gms.maps.MapFragment"/>
+        android:layout_gravity="bottom|right"
+        android:gravity="bottom|center"
+        android:orientation="horizontal">
 
-    <Button
-        android:layout_width="300dp"
-        android:layout_height="40dp"
-        android:text="Start Navigation"
-        android:id="@+id/textView"
-        android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginBottom="30dp"
-        android:gravity="center"
-        android:background="#ff5a5399"
-        android:textColor="#ffffffff"
-        android:textSize="14dp"
-        android:clickable="true"
-        android:onClick="startNavigation" />
+        <TextView
+            android:id="@+id/tvRoute1"
+            style="@style/route_label_a"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="bottom|center"
+            android:layout_margin="8dp"
+            android:text="12 min\nScore: 100"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvRoute2"
+            style="@style/route_label_b"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="8dp"
+            android:text="9 min\nScore: 10"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvRoute3"
+            style="@style/route_label_c"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="8dp"
+            android:text="9 min\nScore: 10"
+            android:visibility="gone" />
+    </LinearLayout>
+    <!--<Button-->
+    <!--android:id="@+id/textView"-->
+    <!--android:layout_width="300dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:layout_gravity="center_horizontal|bottom"-->
+    <!--android:layout_marginBottom="30dp"-->
+    <!--android:layout_marginTop="10dp"-->
+    <!--android:background="#ff5a5399"-->
+    <!--android:clickable="true"-->
+    <!--android:gravity="center"-->
+    <!--android:onClick="startNavigation"-->
+    <!--android:text="Start Navigation"-->
+    <!--android:textColor="#ffffffff"-->
+    <!--android:textSize="14dp" />-->
+    <!--<Button-->
+    <!--android:id="@+id/textView"-->
+    <!--android:layout_width="300dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:layout_gravity="center_horizontal|bottom"-->
+    <!--android:layout_marginBottom="30dp"-->
+    <!--android:background="#ff5a5399"-->
+    <!--android:clickable="true"-->
+    <!--android:gravity="center"-->
+    <!--android:onClick="startNavigation"-->
+    <!--android:text="Start Navigation"-->
+    <!--android:textColor="#ffffffff"-->
+    <!--android:textSize="14dp" />-->
+
+    <!--<TextView-->
+    <!--android:layout_width="100dp"-->
+    <!--android:layout_height="70dp"-->
+    <!--style="@style/menu_labels_style"/>-->
 
 </FrameLayout>

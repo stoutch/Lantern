@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MASproject.iml" filepath="$PROJECT_DIR$/MASproject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PersistentSearch-master/PersistentSearch-master.iml" filepath="$PROJECT_DIR$/PersistentSearch-master/PersistentSearch-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

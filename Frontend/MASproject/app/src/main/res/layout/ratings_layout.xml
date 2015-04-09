@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:numStars="5"
-        android:progressTint="#fff44eff"
+        android:progressTint="@color/pink_pressed"
         android:stepSize="1" />
 
     <!--<View-->

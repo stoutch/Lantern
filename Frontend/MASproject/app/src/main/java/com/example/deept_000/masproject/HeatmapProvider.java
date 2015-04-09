@@ -26,7 +26,6 @@ public class HeatmapProvider {
     private final int RADIUS = 15;
     private final double OPACITY = .5;
     private GoogleMap mGoogleMap;
-    private HttpSender mSender;
     private double mLat;
     private double mLong;
     private final int MAP_RADIUS = 2500;
@@ -39,9 +38,10 @@ public class HeatmapProvider {
      */
     public void addHeatmap(GoogleMap googleMap, Location location) {
         mGoogleMap = googleMap;
-        mSender = new HttpSender();
-        mLat = location.getLatitude();
-        mLong = location.getLongitude();
+        if (location != null) {
+            mLat = location.getLatitude();
+            mLong = location.getLongitude();
+        }
 
         if (dumb) {
             addHeatMapDumb(googleMap);
@@ -55,8 +55,9 @@ public class HeatmapProvider {
      * Formulates the HTTP query for the server using our REST API guideline
      */
     private void getPositiveHeatmapFromServer() {
+        HttpSender sender = new HttpSender();
         String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&radius=%d", ADDRESS, mLat, mLong, MAP_RADIUS);
-        mSender.sendHttpRequest(uri, null, "GET", new WebResponseListener() {
+        sender.sendHttpRequest(uri, null, "GET", new WebResponseListener() {
             @Override
             public void OnSuccess(String response, String... params) {
                 onSuccessfulResponse(response, true);
@@ -78,12 +79,12 @@ public class HeatmapProvider {
      * Formulates the HTTP query for the server using our REST API guideline
      */
     private void getNegativeHeatmapFromServer() {
-        // GET
+        HttpSender sender = new HttpSender();
         String uri = String.format("%s/heatmaps/negative?lat=%f&lng=%f&radius=%d", ADDRESS, mLat, mLong, MAP_RADIUS);
-        mSender.sendHttpRequest(uri, null, "GET", new WebResponseListener() {
+        sender.sendHttpRequest(uri, null, "GET", new WebResponseListener() {
             @Override
             public void OnSuccess(String response, String... params) {
-                onSuccessfulResponse(response, true);
+                onSuccessfulResponse(response, false);
             }
 
             @Override
@@ -105,7 +106,7 @@ public class HeatmapProvider {
             heatmap.positive = isPositive;
         }
         if (heatmap != null && heatmap.success && heatmap.response != null) {
-            System.out.println(heatmap.toString());
+            //System.out.println(heatmap.toString());
             addPointsToMapWithWeight(heatmap);
         } else {
             System.out.println("Heatmap object is null");
@@ -122,7 +123,7 @@ public class HeatmapProvider {
         for (Heatmap.Response response : heatmap.response) {
             int weight = response.weight * response.value / 10;
             list.add(new WeightedLatLng(new LatLng(response.loc.coordinates[1], response.loc.coordinates[0]), weight));
-            System.out.println("Adding " + response.loc.coordinates[1] + ", " + response.loc.coordinates[0] + ": " + weight);
+            //System.out.println("Adding " + response.loc.coordinates[1] + ", " + response.loc.coordinates[0] + ": " + weight);
         }
         HeatmapTileProvider mProvider;
         if (heatmap.positive) {

@@ -1,39 +1,34 @@
 package com.example.deept_000.masproject;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.example.deept_000.masproject.Gson.Routes;
+import com.example.deept_000.masproject.Gson.Routes.Response.Route;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.gson.Gson;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -42,12 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ProcessMessageActivity extends ActionBarActivity implements LocationListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, AsyncResponse {
+public class ProcessMessageActivity extends Activity implements AsyncResponse {
     GoogleMap googleMap;
     Location mLastLocation;
     List<ArrayList<LatLng>> candidates;
-    GoogleApiClient mGoogleApiClient;
     String xmlString;
     ArrayList wayPoints;
     LatLng current;
@@ -69,7 +62,8 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
         setUpMapIfNeeded();
 
         /* Start: */
-        LatLng start = new LatLng(33.777482, -84.397300);
+        Location l = LocationUtil.getLastLocation();
+        LatLng start = new LatLng(l.getLatitude(), l.getLongitude());//new LatLng(33.777482, -84.397300);
         /* Destination: */
         LatLng dest = getLocationFromAddress(message); // 33.772579, -84.394822
 
@@ -116,11 +110,8 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
                     Location location = locationManager.getLastKnownLocation(bestProvider);
                     provider.addHeatmap(googleMap, location);
                     //current = new LatLng(location.getAltitude(), location.getLongitude());
-                    if (location != null) {
-                        onLocationChanged(location);
-                    }
 
-                    locationManager.requestLocationUpdates(bestProvider, 20000, 0, this);
+                    //locationManager.requestLocationUpdates(bestProvider, 20000, 0, this);
                 }
             }
         } catch (Exception e) {
@@ -128,7 +119,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
         }
         if (googleMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+            googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
             // Check if we were successful in obtaining the map.
             if (googleMap != null) {
                 LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -139,70 +130,6 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
                 //addHeatMap();
             }
         }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-        LatLng latLng = new LatLng(latitude, longitude);
-        //googleMap.addMarker(new MarkerOptions().position(latLng));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_process_message, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
     }
 
     public void getDirections(double lat1, double lon1, double lat2, double lon2) {
@@ -229,7 +156,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 
             // 33.772579, -84.394822
 //            String star = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781940) + ",\"lng\":" + String.valueOf(-84.376917) + "}", "UTF-8");
-            String star = URLEncoder.encode("{\"lat\":" + String.valueOf(33.777444) + ",\"lng\":" + String.valueOf(-84.397250) + "}", "UTF-8"); // coc 33.777444, -84.397250
+            String star = URLEncoder.encode("{\"lat\":" + String.valueOf(lat1) + ",\"lng\":" + String.valueOf(lon1) + "}", "UTF-8"); // coc 33.777444, -84.397250
             String dest = URLEncoder.encode("{\"lat\":" + String.valueOf(lat2) + ",\"lng\":" + String.valueOf(lon2) + "}", "UTF-8"); // tech tower
 //            String dest = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781761) + ",\"lng\":" + String.valueOf(-84.405155) + "}", "UTF-8");
 
@@ -237,7 +164,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 //            String dest = URLEncoder.encode("{\"lat\":" + String.valueOf(lat2) + ",\"lng\":" + String.valueOf(lon2) + "}", "UTF-8");
 
             String routesHeatmapFromServer = "http://173.236.254.243:8080/routes?dest=" + dest + "&start=" + star;//{\"lat\":"+dlat+",\"lng\":"+dlng+"}&start={\"lat\":"+slat+",\"lng\":"+slng+"}";
-
+            System.out.println(routesHeatmapFromServer);
             AsyncPostData getJSON = new AsyncPostData();
             getJSON.execute(routesHeatmapFromServer);
             getJSON.delegate = this;
@@ -297,16 +224,105 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
     public void processFinish(String output) {
 
         Log.i("in processFinish:", output);
+        Gson gson = new Gson();
+        Routes routes;
         try {
-            JSONObject top = new JSONObject(output); // outer bracket
-            JSONArray routes = top.getJSONObject("response").getJSONArray("routes");
-            final JSONArray scores = top.getJSONObject("response").getJSONArray("score");
-            JSONArray route_indices = top.getJSONObject("response").getJSONArray("route_index");
+            routes = gson.fromJson(output, Routes.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast toast = Toast.makeText(getApplicationContext(), "Error loading routes", Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+        Log.d("processFinish", routes.toString());
+        TextView[] routeViews = {(TextView) findViewById(R.id.tvRoute1),
+                (TextView) findViewById(R.id.tvRoute2),
+                (TextView) findViewById(R.id.tvRoute3)};
+        int routeNo = 0;
+        int[] colors = {0x8F669900, 0x8FFF8800, 0x8FCC0000};
+        for (Routes.Response.Route r : routes.response.routes) {
+            routeViews[routeNo].setVisibility(View.VISIBLE);
+            PolylineOptions wayOptions = new PolylineOptions();
+            for (Route.Leg leg : r.legs) {
+                routeViews[routeNo].setText(leg.duration.text + "\nScore: " + routes.response.score[routeNo]);
+                Route.Leg.Step step;
+                for (int j = 0; j < leg.steps.length - 1; j++) {
+                    step = leg.steps[j];
+                    wayOptions.add(new LatLng(step.start_location.lat, step.start_location.lng));
+                }
+                step = leg.steps[leg.steps.length - 1];
+                wayOptions.add(new LatLng(step.end_location.lat, step.end_location.lng));
+            }
+            wayOptions.color(colors[routeNo])
+                    .width(20)
+                    .geodesic(true)
+                    .zIndex(routeViews.length - routeNo);
+            Polyline polyLine = googleMap.addPolyline(wayOptions);
+            routeNo++;
+        }
 
+//        try {
+//            JSONObject top = new JSONObject(output); // outer bracket
+//            JSONArray routes = top.getJSONObject("response").getJSONArray("routes");
+//            final JSONArray scores = top.getJSONObject("response").getJSONArray("score");
+//            JSONArray route_indices = top.getJSONObject("response").getJSONArray("route_index");
+//
+//            candidates = new ArrayList<ArrayList<LatLng>>();
+//            for (int i = 0; i < routes.length(); ++i) {
+//                JSONObject curr_route_total = routes.getJSONObject(i);
+//                JSONArray legs = curr_route_total.getJSONArray("legs");
+//                JSONArray steps = legs.getJSONObject(0).getJSONArray("steps"); // assume no waypoints
+//
+//                candidates.add(new ArrayList<LatLng>());
+//                int candidates_tail = candidates.size() - 1;
+//
+//                for (int j = 0; j < steps.length(); ++j) {
+//                    JSONObject curr_step_total = steps.getJSONObject(j);
+//                    JSONObject curr_step_start = curr_step_total.getJSONObject("start_location");
+//                    JSONObject curr_step_end = curr_step_total.getJSONObject("end_location");
+//
+//                    double start_lat = curr_step_start.getDouble("lat");
+//                    double start_lng = curr_step_start.getDouble("lng");
+//                    LatLng leg_start_latlng = new LatLng(start_lat, start_lng);
+//
+//                    double end_lat = curr_step_end.getDouble("lat");
+//                    double end_lng = curr_step_end.getDouble("lng");
+//                    LatLng leg_end_latlng = new LatLng(end_lat, end_lng);
+//
+//                    candidates.get(candidates_tail).add(leg_start_latlng);
+//                    candidates.get(candidates_tail).add(leg_end_latlng);
+//                }
+//            }
+//
+//            // render all routes:
+//            int route_color = 0x8F000000;
+//            final List<PolylineOptions> mPolylines = new ArrayList<PolylineOptions>();
+//            for (int i = 0; i < candidates.size(); ++i) { // for all routes
+//                PolylineOptions wayOptions = new PolylineOptions();
+//                ArrayList<LatLng> curr_route = candidates.get(i);
+//                for (int j = 0; j < curr_route.size(); ++j) { // each step in one route
+//                    wayOptions.add(curr_route.get(j));
+//                }
+//                wayOptions.color(route_color)
+//                        .width(20)
+//                        .geodesic(true);
+//                mPolylines.add(wayOptions);
+//                route_color = route_color + 500;
+//                Polyline myRoutes = googleMap.addPolyline(wayOptions);
+//            }
+//            Log.e("mPolylines:", "" + mPolylines.size());
+
+        // Code for selecting route by clicking on it
+//            selected_route = 0;
+//            best_score = 0;
+//            chosen_index = route_indices.getInt(0);
+//            selected_route_string = route_indices.getString(0);
 //            googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 //                @Override
 //                public void onMapClick(LatLng clickCoords) {
+//                    boolean flag = true;
 //                    for (PolylineOptions polyline : mPolylines) {
+//
 //                        for (LatLng polyCoords : polyline.getPoints()) {
 //                            float[] results = new float[1];
 //                            Location.distanceBetween(clickCoords.latitude, clickCoords.longitude,
@@ -314,151 +330,33 @@ public class ProcessMessageActivity extends ActionBarActivity implements Locatio
 //
 //                            if (results[0] < 100) {
 //                                // If distance is less than 100 meters, this is your polyline
-//                                Log.e("processFinish", "Found @ "+clickCoords.latitude+" "+clickCoords.longitude);
+//                                Log.e("processFinish", "Found @ " + clickCoords.latitude + " " + clickCoords.longitude);
+//                                //Log.e("processFinish", "mPolyline index:" + selected_route_id);
+//                                if (flag) {
+//                                    best_score = selected_route_id;
+//                                    flag = false;
+//                                }
+//                                try {
+//
+//                                    if (scores.getDouble(selected_route_id) > scores.getDouble(best_score))
+//                                        best_score = selected_route_id;
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                }
+//
+//
 //                            }
 //                        }
+//                        selected_route_id++;
 //                    }
 //                }
 //            });
 
-            candidates = new ArrayList<ArrayList<LatLng>>();
-            for (int i = 0; i < routes.length(); ++i) {
-                JSONObject curr_route_total = routes.getJSONObject(i);
-                JSONArray legs = curr_route_total.getJSONArray("legs");
-                JSONArray steps = legs.getJSONObject(0).getJSONArray("steps"); // assume no waypoints
+//            selected_route_id = best_score;
+//            selected_route = best_score;
+//            chosen_index = route_indices.getInt(best_score);
 
-                candidates.add(new ArrayList<LatLng>());
-                int candidates_tail = candidates.size() - 1;
-
-                for (int j = 0; j < steps.length(); ++j) {
-                    JSONObject curr_step_total = steps.getJSONObject(j);
-                    JSONObject curr_step_start = curr_step_total.getJSONObject("start_location");
-                    JSONObject curr_step_end = curr_step_total.getJSONObject("end_location");
-
-                    double start_lat = curr_step_start.getDouble("lat");
-                    double start_lng = curr_step_start.getDouble("lng");
-                    LatLng leg_start_latlng = new LatLng(start_lat, start_lng);
-
-                    double end_lat = curr_step_end.getDouble("lat");
-                    double end_lng = curr_step_end.getDouble("lng");
-                    LatLng leg_end_latlng = new LatLng(end_lat, end_lng);
-
-                    candidates.get(candidates_tail).add(leg_start_latlng);
-                    candidates.get(candidates_tail).add(leg_end_latlng);
-                }
-            }
-
-            // render all routes:
-            int route_color = 0x8F000000;
-            final List<PolylineOptions> mPolylines = new ArrayList<PolylineOptions>();
-            for (int i = 0; i < candidates.size(); ++i) { // for all routes
-                PolylineOptions wayOptions = new PolylineOptions();
-                ArrayList<LatLng> curr_route = candidates.get(i);
-                for (int j = 0; j < curr_route.size(); ++j) { // each step in one route
-                    wayOptions.add(curr_route.get(j));
-                }
-                wayOptions.color(route_color);
-                mPolylines.add(wayOptions);
-                route_color = route_color + 500;
-                Polyline myRoutes = googleMap.addPolyline(wayOptions);
-            }
-            Log.e("mPolylines:", "" + mPolylines.size());
-
-
-            selected_route = 0;
-            best_score = 0;
-            chosen_index = route_indices.getInt(0);
-            selected_route_string = route_indices.getString(0);
-            googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-                @Override
-                public void onMapClick(LatLng clickCoords) {
-                    boolean flag = true;
-                    for (PolylineOptions polyline : mPolylines) {
-
-                        for (LatLng polyCoords : polyline.getPoints()) {
-                            float[] results = new float[1];
-                            Location.distanceBetween(clickCoords.latitude, clickCoords.longitude,
-                                    polyCoords.latitude, polyCoords.longitude, results);
-
-                            if (results[0] < 100) {
-                                // If distance is less than 100 meters, this is your polyline
-                                Log.e("processFinish", "Found @ " + clickCoords.latitude + " " + clickCoords.longitude);
-                                //Log.e("processFinish", "mPolyline index:" + selected_route_id);
-                                if (flag) {
-                                    best_score = selected_route_id;
-                                    flag = false;
-                                }
-                                try {
-
-                                    if (scores.getDouble(selected_route_id) > scores.getDouble(best_score))
-                                        best_score = selected_route_id;
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-
-                            }
-                        }
-                        selected_route_id++;
-                    }
-                }
-            });
-
-            selected_route_id = best_score;
-            selected_route = best_score;
-            chosen_index = route_indices.getInt(best_score);
-
-            Log.e("id pick:", "" + selected_route_id);
-//            if (output.contains("heatmap"))
-//                Log.i("candidate count:", "" + candidates.size());
-//            Log.i("route 1:", "" + candidates.get(0).size());
-//            Log.i("route 2:", "" + candidates.get(1).size());
-            //Log.i("route 3:", ""+candidates.get(2).size());
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-//        InputStream stream = new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8)); // starndardcharset warning
-//        DocumentBuilder builder = null;
-//        try {
-//            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-//        } catch (ParserConfigurationException e) {
-//            e.printStackTrace();
-//        }
-//        String tag[] = { "lat", "lng" };
-//        Document doc = null;
-//        try {
-//            doc = builder.parse(stream);
-//        } catch (SAXException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        ArrayList<LatLng> list_of_geopoints = new ArrayList();
-//        if (doc != null) {
-//            NodeList nl1, nl2;
-//            nl1 = doc.getElementsByTagName(tag[0]);
-//            nl2 = doc.getElementsByTagName(tag[1]);
-//            if (nl1.getLength() > 0) {
-//                list_of_geopoints = new ArrayList();
-//                for (int i = 0; i < nl1.getLength()-4; i++) { // start, end, bound1, bound2
-//                    Node node1 = nl1.item(i);
-//                    Node node2 = nl2.item(i);
-//                    double lat = Double.parseDouble(node1.getTextContent());
-//                    double lng = Double.parseDouble(node2.getTextContent());
-//                    list_of_geopoints.add(new LatLng((double) (lat), (double) (lng)));
-//                }
-//            } else {
-//                // No points found
-//            }
-//        }
-//
-//
-//        PolylineOptions wayOptions = new PolylineOptions();
-//        for(int i=0; i<list_of_geopoints.size(); i++){
-//            wayOptions.add(list_of_geopoints.get(i));
-//        }
-//        Polyline myRoutes = googleMap.addPolyline(wayOptions);
+        Log.e("id pick:", "" + selected_route_id);
     }
 
 
