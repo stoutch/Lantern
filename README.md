@@ -124,6 +124,23 @@ http://173.236.254.243:8080/heatmaps/negative?lat=32.725371&lng= -117.160721&typ
 
 You need to verify the success flag when doing this query.
 
+## Bulk insertion of elements to heatmap
+This is done to insert a list of dictionaries that contain elements to insert into the heatmap.
+
+### POST
+Insertion, it just receive one parameter.
+
+### Query template:
+http://173.236.254.243:8080/bulk_heatmap?list_of_elements=[{"latitude":<lat>,"longitude": <lng>,"type":<type of element>,"value":<value in range [-10,10]},{"latitude":<lat>,"longitude": <lng>,"type":<type of element>,"value":<value in range [-10,10]},{"latitude":<lat>,"longitude": <lng>,"type":<type of element>,"value":<value in range [-10,10]},....]
+
+### Query example
+http://173.236.254.243:8080/bulk_heatmap?list_of_elements=[{"latitude":33.780501,"longitude": -84.396143,"type":"lighting","value":10}]
+
+### Query response
+{"responses": [{"response": {"$oid": "5526e8c7fc64c60c300a5299"}, "success": true}], "success": true}
+
+The first success is for the whole query into the server (if it was received correctly, etc), if it is true, then the dictionary also contains a key "responses", that is an array of the response for each insertion. They are ordered in the same way as the elements that were send, so if the original element was in the first position, then the response back is going to contain the result of that part of the insertion. Then each element of the array is an insertion, with two part, first is the response with the id of the new added elemetn and the second is success, which contains the status of the insertion.
+
 ##Calculation of the score of each route.
 
 1. We obtain all the heatmaps elements that are close to the route.
