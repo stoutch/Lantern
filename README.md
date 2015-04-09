@@ -131,10 +131,10 @@ This is done to insert a list of dictionaries that contain elements to insert in
 Insertion, it just receive one parameter.
 
 ### Query template:
-http://173.236.254.243:8080/bulk_heatmap?list_of_elements=[{"latitude":<lat>,"longitude": <lng>,"type":<type of element>,"value":<value in range [-10,10]},{"latitude":<lat>,"longitude": <lng>,"type":<type of element>,"value":<value in range [-10,10]},{"latitude":<lat>,"longitude": <lng>,"type":<type of element>,"value":<value in range [-10,10]},....]
+http://173.236.254.243:8080/bulk_heatmap?list_of_elements=[{"latitude":<lat>,"longitude": <lng>,"type":<type of element>,"value":<value in range [-10,10],"day":<True or False>},{"latitude":<lat>,"longitude": <lng>,"type":<type of element>,"value":<value in range [-10,10],"day":<True or False>},{"latitude":<lat>,"longitude": <lng>,"type":<type of element>,"value":<value in range [-10,10],"day":<True or False>},....]
 
 ### Query example
-http://173.236.254.243:8080/bulk_heatmap?list_of_elements=[{"latitude":33.780501,"longitude": -84.396143,"type":"lighting","value":10}]
+http://173.236.254.243:8080/bulk_heatmap?list_of_elements=[{"latitude":33.780501,"longitude": -84.396143,"type":"lighting","value":10,"day":True}]
 
 ### Query response
 {"responses": [{"response": {"$oid": "5526e8c7fc64c60c300a5299"}, "success": true}], "success": true}
