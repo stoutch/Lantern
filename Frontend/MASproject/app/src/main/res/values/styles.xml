@@ -24,4 +24,51 @@
         <item name="android:background">@drawable/floating_label_background_c</item>
         <item name="android:textColor">@color/white</item>
     </style>
+    <!-- the theme applied to the application or activity -->
+    <style name="CustomActionBarTheme" parent="@style/Theme.AppCompat.Light">
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="android:actionBarTabTextStyle">@style/TabTextStyle</item>
+        <item name="android:actionMenuTextColor">@color/white</item>
+        <item name="searchViewStyle">@style/SearchView</item>
+
+        <item name="colorPrimary">@color/bright_blue</item>
+        <item name="colorPrimaryDark">@color/darker_blue</item>
+        <!--<item name="colorAccent">@color/white</item>-->
+
+        <!-- Support library compatibility -->
+        <item name="actionBarStyle">@style/MyActionBar</item>
+        <item name="actionBarTabTextStyle">@style/TabTextStyle</item>
+        <item name="actionMenuTextColor">@color/white</item>
+    </style>
+
+    <!-- general styles for the action bar -->
+    <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar">
+        <item name="android:titleTextStyle">@style/TitleTextStyle</item>
+        <item name="android:background">@color/bright_blue</item>
+
+        <!-- Support library compatibility -->
+        <item name="titleTextStyle">@style/TitleTextStyle</item>
+        <item name="background">@color/bright_blue</item>
+    </style>
+
+    <style name="SearchView" parent="Widget.AppCompat.SearchView">
+        <item name="searchIcon">@drawable/ic_search_white_24dp</item>
+        <item name="closeIcon">@drawable/ic_clear_white_24dp</item>
+        <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextView</item>
+    </style>
+
+    <style name="AutoCompleteTextView" parent="Widget.AppCompat.Light.AutoCompleteTextView">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textCursorDrawable">@null</item>
+    </style>
+
+    <!-- action bar title text -->
+    <style name="TitleTextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- action bar tab text -->
+    <style name="TabTextStyle" parent="@style/Widget.AppCompat.ActionBar.TabText">
+        <item name="android:textColor">@color/white</item>
+    </style>
 </resources>

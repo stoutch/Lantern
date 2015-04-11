@@ -1,16 +1,15 @@
 package com.example.deept_000.masproject;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.location.Address;
 import android.location.Criteria;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,7 +18,11 @@ import com.example.deept_000.masproject.Gson.Routes.Response.Route;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
@@ -30,17 +33,16 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
 
 
-public class ProcessMessageActivity extends Activity implements AsyncResponse {
+public class ProcessMessageActivity extends ActionBarActivity implements AsyncResponse {
     GoogleMap googleMap;
     Location mLastLocation;
-    List<ArrayList<LatLng>> candidates;
+    ArrayList<ArrayList<LatLng>> candidates;
+    Routes mRoutes;
     String xmlString;
     ArrayList wayPoints;
     LatLng current;
@@ -49,6 +51,8 @@ public class ProcessMessageActivity extends Activity implements AsyncResponse {
     int best_score;
     int chosen_index;
     String selected_route_string;
+    private LatLng mDest;
+    private LatLng mStart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,39 +60,22 @@ public class ProcessMessageActivity extends Activity implements AsyncResponse {
 
         Intent intent = getIntent();
         String message = intent.getStringExtra(InputActivity.EXTRA_MESSAGE);
-
+        /* Destination: */
+        mDest = LocationUtil.getLocationFromAddress(message, this); // 33.772579, -84.394822
         setContentView(R.layout.activity_process_message);
         selected_route = 0;
         setUpMapIfNeeded();
 
         /* Start: */
         Location l = LocationUtil.getLastLocation();
-        LatLng start = new LatLng(l.getLatitude(), l.getLongitude());//new LatLng(33.777482, -84.397300);
-        /* Destination: */
-        LatLng dest = getLocationFromAddress(message); // 33.772579, -84.394822
+        mStart = new LatLng(l.getLatitude(), l.getLongitude());//new LatLng(33.777482, -84.397300);
 
-        getDirections(start.latitude, start.longitude, dest.latitude, dest.longitude);
+
+        getDirections(mStart.latitude, mStart.longitude, mDest.latitude, mDest.longitude);
 
 
     }
 
-    public LatLng getLocationFromAddress(String strAddress) {
-
-        Geocoder coder = new Geocoder(this);
-        List<Address> address;
-        try {
-            address = coder.getFromLocationName(strAddress, 5);
-            int address_size = address.size();
-            Address location = address.get(0);
-            location.getLatitude();
-            location.getLongitude();
-            return new LatLng(location.getLatitude(), location.getLongitude());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -99,9 +86,8 @@ public class ProcessMessageActivity extends Activity implements AsyncResponse {
                 googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
                 // Check if we were successful in obtaining the map.
                 if (googleMap != null) {
-                    LatLng tech = new LatLng(33.775635, -84.396444);
                     googleMap.setMyLocationEnabled(true);
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 13));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDest, 15));
                     //addHeatMap();
                     /* Location Manager: */
                     LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -109,6 +95,9 @@ public class ProcessMessageActivity extends Activity implements AsyncResponse {
                     String bestProvider = locationManager.getBestProvider(criteria, true);
                     Location location = locationManager.getLastKnownLocation(bestProvider);
                     provider.addHeatmap(googleMap, location);
+                    Marker marker = googleMap.addMarker(new MarkerOptions()
+                            .position(mDest)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_marker_34dp)));
                     //current = new LatLng(location.getAltitude(), location.getLongitude());
 
                     //locationManager.requestLocationUpdates(bestProvider, 20000, 0, this);
@@ -136,44 +125,18 @@ public class ProcessMessageActivity extends Activity implements AsyncResponse {
         int a = 12;
         // { before after, include ", escape\" etc. see github comment
         String url = "http://maps.googleapis.com/maps/api/directions/xml?origin=" + lat1 + "," + lon1 + "&destination=" + lat2 + "," + lon2 + "&sensor=false&units=metric&mode=walking";
-//        AsyncPostData getxml = new AsyncPostData();
-//        getxml.execute(url);
-//        getxml.delegate = this;
-        //String url_json = "http://maps.googleapis.com/maps/api/directions/json?origin=" +lat1 + "," + lon1  + "&destination=" + lat2 + "," + lon2 + "&sensor=false&units=metric&mode=walking&alternatives=true";
-
-        // from server:
-        // String routesHeatmapFromServer = "http://173.236.254.243:8080/routes?dest={%22lat%22:33.781777,%20%22lng%22:-84.395426}&start={%22lat%22:33.777229,%22lng%22:%20-84.396187}";
-
-        // String rfs = "http://173.236.254.243:8080/routes?dest={\"lat\":33.781761, \"lng\":-84.405155}&start={\"lat\":33.781940,\"lng\": -84.376917}";
-
-
         try {
-
-////            String slng = URLEncoder.encode(String.valueOf(-84.396187), "UTF-8");
-
-//            String dlng = URLEncoder.encode(String.valueOf(-84.395426), "UTF-8");
-
-
-            // 33.772579, -84.394822
-//            String star = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781940) + ",\"lng\":" + String.valueOf(-84.376917) + "}", "UTF-8");
             String star = URLEncoder.encode("{\"lat\":" + String.valueOf(lat1) + ",\"lng\":" + String.valueOf(lon1) + "}", "UTF-8"); // coc 33.777444, -84.397250
             String dest = URLEncoder.encode("{\"lat\":" + String.valueOf(lat2) + ",\"lng\":" + String.valueOf(lon2) + "}", "UTF-8"); // tech tower
-//            String dest = URLEncoder.encode("{\"lat\":" + String.valueOf(33.781761) + ",\"lng\":" + String.valueOf(-84.405155) + "}", "UTF-8");
-
-//            String star = URLEncoder.encode("{\"lat\":" + String.valueOf(lat1) + ",\"lng\":" + String.valueOf(lon1) + "}", "UTF-8");
-//            String dest = URLEncoder.encode("{\"lat\":" + String.valueOf(lat2) + ",\"lng\":" + String.valueOf(lon2) + "}", "UTF-8");
 
             String routesHeatmapFromServer = "http://173.236.254.243:8080/routes?dest=" + dest + "&start=" + star;//{\"lat\":"+dlat+",\"lng\":"+dlng+"}&start={\"lat\":"+slat+",\"lng\":"+slng+"}";
             System.out.println(routesHeatmapFromServer);
             AsyncPostData getJSON = new AsyncPostData();
             getJSON.execute(routesHeatmapFromServer);
             getJSON.delegate = this;
-
-
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
     }
 
 
@@ -187,19 +150,14 @@ public class ProcessMessageActivity extends Activity implements AsyncResponse {
             return result;
         }
 
-
         protected void onPostExecute(String result) {
             delegate.processFinish(result);
         }
-
-
     }
 
     public String getXML(String url) {
 
         String result = null;
-
-
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpGet httpPost = new HttpGet(url);
@@ -222,44 +180,58 @@ public class ProcessMessageActivity extends Activity implements AsyncResponse {
 
     @Override
     public void processFinish(String output) {
-
+        ProgressBar pbRoute = (ProgressBar) findViewById(R.id.pbRoute);
+        pbRoute.setVisibility(View.GONE);
         Log.i("in processFinish:", output);
         Gson gson = new Gson();
-        Routes routes;
         try {
-            routes = gson.fromJson(output, Routes.class);
+            mRoutes = gson.fromJson(output, Routes.class);
         } catch (Exception e) {
             e.printStackTrace();
             Toast toast = Toast.makeText(getApplicationContext(), "Error loading routes", Toast.LENGTH_LONG);
             toast.show();
             return;
         }
-        Log.d("processFinish", routes.toString());
+        Log.d("processFinish", mRoutes.toString());
         TextView[] routeViews = {(TextView) findViewById(R.id.tvRoute1),
                 (TextView) findViewById(R.id.tvRoute2),
                 (TextView) findViewById(R.id.tvRoute3)};
         int routeNo = 0;
-        int[] colors = {0x8F669900, 0x8FFF8800, 0x8FCC0000};
-        for (Routes.Response.Route r : routes.response.routes) {
+        int[] colors = {0xFF99CC00, 0xFF669900, 0xFFFFBB33, 0xFFFF8800, 0xFFFF4444, 0xFFCC0000};
+        candidates = new ArrayList<ArrayList<LatLng>>();
+        for (Routes.Response.Route r : mRoutes.response.routes) {
+            ArrayList<LatLng> ll = new ArrayList<LatLng>();
             routeViews[routeNo].setVisibility(View.VISIBLE);
             PolylineOptions wayOptions = new PolylineOptions();
             for (Route.Leg leg : r.legs) {
-                routeViews[routeNo].setText(leg.duration.text + "\nScore: " + routes.response.score[routeNo]);
+                routeViews[routeNo].setText(leg.duration.text + "\nScore: " + ((int) mRoutes.response.score[routeNo]));
                 Route.Leg.Step step;
                 for (int j = 0; j < leg.steps.length - 1; j++) {
                     step = leg.steps[j];
                     wayOptions.add(new LatLng(step.start_location.lat, step.start_location.lng));
+                    ll.add(new LatLng(step.start_location.lat, step.start_location.lng));
                 }
                 step = leg.steps[leg.steps.length - 1];
                 wayOptions.add(new LatLng(step.end_location.lat, step.end_location.lng));
+                ll.add(new LatLng(step.end_location.lat, step.end_location.lng));
             }
-            wayOptions.color(colors[routeNo])
-                    .width(20)
-                    .geodesic(true)
-                    .zIndex(routeViews.length - routeNo);
+            candidates.add(ll);
+            wayOptions.color(colors[2 * routeNo])
+                    .width(17)
+                    .zIndex(2 * (routeViews.length - routeNo));
             Polyline polyLine = googleMap.addPolyline(wayOptions);
+            wayOptions.color(colors[2 * routeNo + 1])
+                    .width(25)
+                    .zIndex(2 * (routeViews.length - routeNo) - 1);
+            Polyline polyLine2 = googleMap.addPolyline(wayOptions);
             routeNo++;
         }
+
+        LatLngBounds route = new LatLngBounds.Builder()
+                .include(mDest)
+                .include(mStart)
+                .build();
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(route, 300));
 
 //        try {
 //            JSONObject top = new JSONObject(output); // outer bracket
@@ -366,6 +338,36 @@ public class ProcessMessageActivity extends Activity implements AsyncResponse {
         Log.v("startNavigation", "PM selected route is " + selected_route_string);
         intent.putExtra("selected_route_id", selected_route_string);
         ArrayList<LatLng> route = candidates.get(selected_route);
+        intent.putParcelableArrayListExtra("selected_route", route);
+        startActivity(intent);
+    }
+
+    public void navigateRouteA(View view) {
+        Intent intent = new Intent(this, Navigation.class);
+        String routeId = Long.toString(mRoutes.response.route_index[0]);
+        intent.putExtra("selected_route_id", routeId);
+
+        ArrayList<LatLng> route = candidates.get(0);
+        intent.putParcelableArrayListExtra("selected_route", route);
+        startActivity(intent);
+    }
+
+    public void navigateRouteB(View view) {
+        Intent intent = new Intent(this, Navigation.class);
+        String routeId = Long.toString(mRoutes.response.route_index[1]);
+        intent.putExtra("selected_route_id", routeId);
+
+        ArrayList<LatLng> route = candidates.get(1);
+        intent.putParcelableArrayListExtra("selected_route", route);
+        startActivity(intent);
+    }
+
+    public void navigateRouteC(View view) {
+        Intent intent = new Intent(this, Navigation.class);
+        String routeId = Long.toString(mRoutes.response.route_index[2]);
+        intent.putExtra("selected_route_id", routeId);
+
+        ArrayList<LatLng> route = candidates.get(2);
         intent.putParcelableArrayListExtra("selected_route", route);
         startActivity(intent);
     }

@@ -130,7 +130,6 @@ public class GetLocationService extends IntentService implements
     public void onLocationChanged(Location location) {
         LocationUtil.updateLocation(location);
         mCurrentLocation = location;
-
     }
 
     @Override

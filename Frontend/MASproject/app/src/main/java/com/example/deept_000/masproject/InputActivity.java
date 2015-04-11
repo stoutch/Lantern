@@ -1,8 +1,10 @@
 package com.example.deept_000.masproject;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +18,15 @@ public class InputActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_input);
+        Log.d("InputActivity", "onCreate");
+
+        // Get the intent, verify the action and get the query
+        Intent intent = getIntent();
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            Log.d("InputActivity", "action");
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            //doMySearch(query);
+        }
     }
 
 
@@ -48,4 +59,5 @@ public class InputActivity extends Activity {
         intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
     }
+
 }

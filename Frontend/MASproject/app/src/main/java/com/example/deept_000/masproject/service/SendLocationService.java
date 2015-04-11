@@ -44,7 +44,7 @@ public class SendLocationService extends IntentService {
 
             // check for when we need to let the system know the wakeful intent is done
             final boolean done = (i == locationHistory.size() - 1 ? true : false);
-            String uri = String.format("%s/heatmaps/negative?lat=%f&lng=%f&type=lighting&value=-10", ADDRESS, lat, lng);
+            String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&type=lighting&value=-10", ADDRESS, lat, lng);
             sender.sendHttpRequest(uri, "", "POST", new WebResponseListener() {
                 @Override
                 public void OnSuccess(String response, String... params) {

@@ -12,10 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.quinny898.library.persistentsearch.SearchBox
-        android:id="@+id/searchbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <!--<com.quinny898.library.persistentsearch.SearchBox-->
+    <!--android:id="@+id/searchbox"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content" />-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,159 +24,86 @@
         android:gravity="bottom|right"
         android:orientation="vertical">
 
-        <com.getbase.floatingactionbutton.FloatingActionsMenu
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_gravity="bottom|right"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            fab:fab_addButtonColorNormal="@color/purple"
-            fab:fab_addButtonColorPressed="@color/light_purple"
-            fab:fab_addButtonPlusIconColor="@color/white"
-            fab:fab_addButtonSize="normal"
-            fab:fab_expandDirection="up"
-            fab:fab_labelStyle="@style/menu_labels_style"
-            fab:fab_labelsPosition="left">
+        <!--<com.getbase.floatingactionbutton.FloatingActionsMenu-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_gravity="bottom|right"-->
+        <!--android:layout_marginLeft="16dp"-->
+        <!--android:layout_marginStart="16dp"-->
+        <!--fab:fab_addButtonColorNormal="@color/purple"-->
+        <!--fab:fab_addButtonColorPressed="@color/light_purple"-->
+        <!--fab:fab_addButtonPlusIconColor="@color/white"-->
+        <!--fab:fab_addButtonSize="normal"-->
+        <!--fab:fab_expandDirection="up"-->
+        <!--fab:fab_labelStyle="@style/menu_labels_style"-->
+        <!--fab:fab_labelsPosition="left">-->
 
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="inputDestination"
-                fab:fab_colorNormal="@color/pink"
-                fab:fab_colorPressed="@color/pink_pressed"
-                fab:fab_icon="@drawable/ic_navigation_white"
-                fab:fab_size="mini"
-                fab:fab_title="Navigate" />
+        <!--<com.getbase.floatingactionbutton.FloatingActionButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:onClick="inputDestination"-->
+        <!--fab:fab_colorNormal="@color/pink"-->
+        <!--fab:fab_colorPressed="@color/pink_pressed"-->
+        <!--fab:fab_icon="@drawable/ic_navigation_white"-->
+        <!--fab:fab_size="mini"-->
+        <!--fab:fab_title="Navigate" />-->
 
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="reportConditions"
-                fab:fab_colorNormal="@color/pink"
-                fab:fab_colorPressed="@color/pink_pressed"
-                fab:fab_icon="@drawable/ic_create_white"
-                fab:fab_size="mini"
-                fab:fab_title="Report" />
+        <!--<com.getbase.floatingactionbutton.FloatingActionButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:onClick="reportConditions"-->
+        <!--fab:fab_colorNormal="@color/pink"-->
+        <!--fab:fab_colorPressed="@color/pink_pressed"-->
+        <!--fab:fab_icon="@drawable/ic_flag_white_24dp"-->
+        <!--fab:fab_size="mini"-->
+        <!--fab:fab_title="Report" />-->
 
-        </com.getbase.floatingactionbutton.FloatingActionsMenu>
+        <!--</com.getbase.floatingactionbutton.FloatingActionsMenu>-->
 
         <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabReport"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_gravity="bottom|right"
-            fab:fab_colorNormal="@color/red"/>
+            android:onClick="reportConditions"
+            fab:fab_colorNormal="@color/bright_purple"
+            fab:fab_icon="@drawable/ic_flag_white_24dp" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabPanic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="bottom|right"
+            fab:fab_colorNormal="@color/alert_red"
+            fab:fab_icon="@drawable/ic_error_cropped" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabNavigate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="bottom|right"
+            android:onClick="showRoutes"
+            android:visibility="gone"
+            fab:fab_colorNormal="@color/bright_blue"
+            fab:fab_icon="@drawable/ic_navigation_white" />
+
+        <!--<EditText-->
+        <!--android:id="@+id/searchView"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom|center"-->
+        <!--android:background="@color/white"-->
+        <!--android:onClick="inputDestination"-->
+        <!--android:paddingBottom="16dp"-->
+        <!--android:paddingLeft="7dp"-->
+        <!--android:paddingRight="7dp"-->
+        <!--android:paddingTop="16dp" />-->
     </LinearLayout>
-    <!--<com.getbase.floatingactionbutton.FloatingActionsMenu-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentLeft="true"-->
-    <!--android:layout_alignParentStart="true"-->
-    <!--android:layout_gravity="bottom|right"-->
-    <!--android:layout_marginLeft="16dp"-->
-    <!--android:layout_marginStart="16dp"-->
-    <!--fab:fab_addButtonColorNormal="@color/purple"-->
-    <!--fab:fab_addButtonColorPressed="@color/light_purple"-->
-    <!--fab:fab_addButtonPlusIconColor="@color/white"-->
-    <!--fab:fab_addButtonSize="normal"-->
-    <!--fab:fab_expandDirection="up"-->
-    <!--fab:fab_labelStyle="@style/menu_labels_style"-->
-    <!--fab:fab_labelsPosition="left">-->
-
-    <!--<com.getbase.floatingactionbutton.FloatingActionButton-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:onClick="inputDestination"-->
-    <!--fab:fab_colorNormal="@color/pink"-->
-    <!--fab:fab_colorPressed="@color/pink_pressed"-->
-    <!--fab:fab_icon="@drawable/ic_navigation_white"-->
-    <!--fab:fab_size="mini"-->
-    <!--fab:fab_title="Navigate" />-->
-
-    <!--<com.getbase.floatingactionbutton.FloatingActionButton-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:onClick="reportConditions"-->
-    <!--fab:fab_colorNormal="@color/pink"-->
-    <!--fab:fab_colorPressed="@color/pink_pressed"-->
-    <!--fab:fab_icon="@drawable/ic_create_white"-->
-    <!--fab:fab_size="mini"-->
-    <!--fab:fab_title="Report" />-->
-
-    <!--</com.getbase.floatingactionbutton.FloatingActionsMenu>-->
-
-    <!--<com.getbase.floatingactionbutton.FloatingActionButton-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_centerHorizontal="true"-->
-    <!--android:layout_gravity="bottom|right"-->
-    <!--android:layout_marginBottom="16dp"-->
-    <!--android:text="SOS"-->
-    <!--fab:fab_colorNormal="@color/red" />-->
-
-
-    <!--<com.melnykov.fab.FloatingActionButton xmlns:fab="http://schemas.android.com/apk/res-auto"-->
-    <!--android:id="@+id/fab"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="bottom|right"-->
-    <!--android:layout_margin="16dp"-->
-    <!--fab:fab_colorNormal="@color/primary"-->
-    <!--fab:fab_colorPressed="@color/primary_pressed"-->
-    <!--fab:fab_colorRipple="@color/ripple" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/textView"-->
-    <!--android:layout_width="300dp"-->
-    <!--android:layout_height="40dp"-->
-    <!--android:layout_gravity="center_horizontal|bottom"-->
-    <!--android:layout_marginBottom="75dp"-->
-    <!--android:background="#ff5a5399"-->
-    <!--android:gravity="center"-->
-    <!--android:text="Select Destination"-->
-    <!--android:textColor="#ffffffff"-->
-    <!--android:textSize="14dp" />-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="300dp"-->
-    <!--android:layout_height="40dp"-->
-    <!--android:layout_gravity="center_horizontal|bottom"-->
-    <!--android:layout_marginBottom="30dp">-->
-
-
-    <!--<EditText-->
-    <!--android:id="@+id/editText"-->
-    <!--android:layout_width="250dp"-->
-    <!--android:layout_height="fill_parent"-->
-    <!--android:layout_alignParentLeft="true"-->
-    <!--android:layout_weight="1.85"-->
-    <!--android:background="#ffffffff"-->
-    <!--android:clickable="true"-->
-    <!--android:ems="10"-->
-    <!--android:gravity="center"-->
-    <!--android:hint="Search for address or tap on the map"-->
-    <!--android:inputType="textPostalAddress"-->
-    <!--android:onClick="inputDestination"-->
-    <!--android:textColorHint="#ff909090"-->
-    <!--android:textSize="13dp" />-->
-
-    <!--<ImageButton-->
-    <!--android:id="@+id/imageButton"-->
-    <!--android:layout_width="40dp"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_alignParentRight="true"-->
-    <!--android:layout_weight="2.29"-->
-    <!--android:adjustViewBounds="true"-->
-    <!--android:background="#ffffffff"-->
-    <!--android:clickable="true"-->
-    <!--android:maxWidth="10dp"-->
-    <!--android:onClick="inputDestination"-->
-    <!--android:padding="8dp"-->
-    <!--android:scaleType="fitCenter"-->
-    <!--android:src="@drawable/search_button" />-->
-    <!--</LinearLayout>-->
 
 
 </FrameLayout>

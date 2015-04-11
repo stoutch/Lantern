@@ -35,8 +35,10 @@
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
         android:layout_margin="10dp"
+        android:background="@color/bright_purple"
         android:onClick="login"
-        android:text="@string/login" />
+        android:text="@string/login"
+        android:textColor="@color/white" />
 
     <ProgressBar
         android:id="@+id/pbLogin"

@@ -1,19 +1,21 @@
 package com.example.deept_000.masproject;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,7 +23,10 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -42,7 +47,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 
-public class Navigation extends Activity implements AsyncResponse {
+public class Navigation extends ActionBarActivity implements AsyncResponse {
 
     private final String ADDRESS = "http://173.236.254.243:8080";
     GoogleMap googleMap;
@@ -50,6 +55,7 @@ public class Navigation extends Activity implements AsyncResponse {
     String selected_route_string;
     ArrayList<LatLng> route;
     public static String serverURL = "http://173.236.254.243:8080/";
+    private final String TAG = "Navigation";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +131,9 @@ public class Navigation extends Activity implements AsyncResponse {
                     googleMap.setMyLocationEnabled(true);
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 15));
                     provider.addHeatmap(googleMap, getLastLocation());
+                    Marker marker = googleMap.addMarker(new MarkerOptions()
+                            .position(route.get(0))
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_marker_34dp)));
                     //addHeatMap();
                     displayRoute();
                 }
@@ -148,7 +157,17 @@ public class Navigation extends Activity implements AsyncResponse {
         for (int i = 0; i < route.size(); i++) {
             wayOptions.add(route.get(i));
         }
+        wayOptions.color(0xFFBB77EE)
+                .width(17)
+                .geodesic(true)
+                .zIndex(2);
+
         Polyline myRoutes = googleMap.addPolyline(wayOptions);
+        wayOptions.color(0xFF893ec7)
+                .width(25)
+                .geodesic(true)
+                .zIndex(1);
+        Polyline myRoutes2 = googleMap.addPolyline(wayOptions);
     }
 
     private class AsyncPostData extends AsyncTask<String, Void, String> { // last variable: return value of doInBackground
@@ -263,8 +282,7 @@ public class Navigation extends Activity implements AsyncResponse {
             @Override
             public void onClick(View v) {
                 System.out.println("Reported lighting conditions");
-                dialog.dismiss();
-                sendLightRating();
+                sendLightRating(dialog);
             }
         });
         TextView police = (TextView) dialog.findViewById(R.id.tvPolicePresence);
@@ -277,7 +295,7 @@ public class Navigation extends Activity implements AsyncResponse {
             }
         });
         TextView cancel = (TextView) dialog.findViewById(R.id.tvCancelReport);
-        police.setOnClickListener(new View.OnClickListener() {
+        cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
@@ -286,16 +304,55 @@ public class Navigation extends Activity implements AsyncResponse {
         dialog.show();
     }
 
-    private void sendLightRating() {
-        Location location = getLastLocation();
-        double lat = location.getLatitude();
-        double lng = location.getLongitude();
-        int radius = 2500;
-        String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&type=lighting&value=10", ADDRESS, lat, lng);
-        HttpPostTask httpPostTask = new HttpPostTask();
-        httpPostTask.execute(uri);
+    private void sendLightRating(final Dialog dialog) {
+        Button send = (Button) dialog.findViewById(R.id.btnSend);
+        TextView police = (TextView) dialog.findViewById(R.id.tvPolicePresence);
+        final RatingBar rbLight = (RatingBar) dialog.findViewById(R.id.rbLight);
+        rbLight.setVisibility(View.VISIBLE);
+        police.setVisibility(View.GONE);
+        send.setVisibility(View.VISIBLE);
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int stars = (int) rbLight.getRating();
+                Location location = LocationUtil.getLastLocation();//getLastLocation();
+                double lat = location.getLatitude();
+                double lng = location.getLongitude();
+                int rating = getRatingFromStars(stars);
+                Log.d(TAG, "Light rating: " + rating);
+                dialog.dismiss();
+                String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&type=lighting&value=%d", ADDRESS, lat, lng, rating);
+                HttpPostTask httpPostTask = new HttpPostTask();
+                httpPostTask.execute(uri);
+            }
+        });
+
     }
 
+    private int getRatingFromStars(int stars) {
+        int rating = 0;
+        switch (stars) {
+            case 0:
+                rating = -10;
+                break;
+            case 1:
+                rating = -5;
+                break;
+            case 2:
+                rating = 0;
+                break;
+            case 3:
+                rating = 3;
+                break;
+            case 4:
+                rating = 5;
+                break;
+            case 5:
+                rating = 10;
+                break;
+        }
+        return rating;
+    }
 
     private void sendPoliceRating() {
         Location location = getLastLocation();
@@ -347,6 +404,8 @@ public class Navigation extends Activity implements AsyncResponse {
                 System.out.println("Clicked done, rating: " + rating);
                 dialog.dismiss();
                 sendRating(rating);
+                Intent intent = new Intent(getApplicationContext(), InitialMapActivity.class);
+                startActivity(intent);
             }
         });
 

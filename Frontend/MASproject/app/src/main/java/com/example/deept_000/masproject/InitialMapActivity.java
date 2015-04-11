@@ -1,18 +1,26 @@
 package com.example.deept_000.masproject;
 
-import android.app.Activity;
 import android.app.Dialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.deept_000.masproject.service.SendLocationReceiver;
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -21,7 +29,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -38,7 +49,7 @@ import java.io.UnsupportedEncodingException;
 //import android.content.Intent;
 
 
-public class InitialMapActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
+public class InitialMapActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     GoogleMap googleMap;
@@ -46,6 +57,9 @@ public class InitialMapActivity extends Activity implements GoogleApiClient.Conn
     private GoogleApiClient mGoogleApiClient;
     protected static final String TAG = "InitialMapActivity";
     protected LocationRequest mLocationRequest;
+    public final static String EXTRA_MESSAGE = "com.example.deept_000.MESSAGE";
+    private String mDestination;
+    private Marker mCurrentMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +97,13 @@ public class InitialMapActivity extends Activity implements GoogleApiClient.Conn
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_initial_map, menu);
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setIconifiedByDefault(false);
+        }
         return true;
     }
 
@@ -92,14 +112,51 @@ public class InitialMapActivity extends Activity implements GoogleApiClient.Conn
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.search:
+                onSearchRequested();
+                return true;
+            default:
+                return false;
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+    @Override
+    protected void onNewIntent(Intent intent) {
+        // Because this activity has set launchMode="singleTop", the system calls this method
+        // to deliver the intent if this activity is currently the foreground activity when
+        // invoked again (when the user executes a search from this activity, we don't create
+        // a new instance of this activity, so the system delivers the search intent here)
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        System.out.println("InitialMapActivity.handleIntent");
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            System.out.println("doing Action Search");
+            // handles a search query
+            mDestination = intent.getStringExtra(SearchManager.QUERY);
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                    SuggestionProvider.AUTHORITY, SuggestionProvider.MODE);
+            suggestions.saveRecentQuery(mDestination, null);
+
+            FloatingActionButton report = (FloatingActionButton) findViewById(R.id.fabReport);
+            FloatingActionButton panic = (FloatingActionButton) findViewById(R.id.fabPanic);
+            FloatingActionButton nav = (FloatingActionButton) findViewById(R.id.fabNavigate);
+            report.setVisibility(View.GONE);
+            panic.setVisibility(View.GONE);
+            nav.setVisibility(View.VISIBLE);
+
+            LatLng loc = LocationUtil.getLocationFromAddress(mDestination, this);
+            if (mCurrentMarker != null) {
+                mCurrentMarker.remove();
+            }
+
+            mCurrentMarker = googleMap.addMarker(new MarkerOptions()
+                    .position(loc)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_marker_34dp)));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
+        }
     }
 
     /**
@@ -172,6 +229,12 @@ public class InitialMapActivity extends Activity implements GoogleApiClient.Conn
         startActivity(intent);
     }
 
+    public void showRoutes(View view) {
+        Intent intent = new Intent(this, ProcessMessageActivity.class);
+        intent.putExtra(EXTRA_MESSAGE, mDestination);
+        startActivity(intent);
+    }
+
     public void reportConditions(View view) {
         final Dialog dialog = new Dialog(InitialMapActivity.this);
         dialog.setContentView(R.layout.report_dialog);
@@ -180,8 +243,7 @@ public class InitialMapActivity extends Activity implements GoogleApiClient.Conn
             @Override
             public void onClick(View v) {
                 System.out.println("Reported lighting conditions");
-                dialog.dismiss();
-                sendLightRating();
+                sendLightRating(dialog);
             }
         });
         TextView police = (TextView) dialog.findViewById(R.id.tvPolicePresence);
@@ -203,13 +265,54 @@ public class InitialMapActivity extends Activity implements GoogleApiClient.Conn
         dialog.show();
     }
 
-    private void sendLightRating() {
-        Location location = LocationUtil.getLastLocation();//getLastLocation();
-        double lat = location.getLatitude();
-        double lng = location.getLongitude();
-        String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&type=lighting&value=10", ADDRESS, lat, lng);
-        HttpPostTask httpPostTask = new HttpPostTask();
-        httpPostTask.execute(uri);
+    private void sendLightRating(final Dialog dialog) {
+        Button send = (Button) dialog.findViewById(R.id.btnSend);
+        TextView police = (TextView) dialog.findViewById(R.id.tvPolicePresence);
+        final RatingBar rbLight = (RatingBar) dialog.findViewById(R.id.rbLight);
+        rbLight.setVisibility(View.VISIBLE);
+        police.setVisibility(View.GONE);
+        send.setVisibility(View.VISIBLE);
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int stars = (int) rbLight.getRating();
+                Location location = LocationUtil.getLastLocation();//getLastLocation();
+                double lat = location.getLatitude();
+                double lng = location.getLongitude();
+                int rating = getRatingFromStars(stars);
+                Log.d(TAG, "Light rating: " + rating);
+                dialog.dismiss();
+                String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&type=lighting&value=%d", ADDRESS, lat, lng, rating);
+                HttpPostTask httpPostTask = new HttpPostTask();
+                httpPostTask.execute(uri);
+            }
+        });
+
+    }
+
+    private int getRatingFromStars(int stars) {
+        int rating = 0;
+        switch (stars) {
+            case 0:
+                rating = -10;
+                break;
+            case 1:
+                rating = -5;
+                break;
+            case 2:
+                rating = 0;
+                break;
+            case 3:
+                rating = 3;
+                break;
+            case 4:
+                rating = 5;
+                break;
+            case 5:
+                rating = 10;
+                break;
+        }
+        return rating;
     }
 
     private void sendPoliceRating() {

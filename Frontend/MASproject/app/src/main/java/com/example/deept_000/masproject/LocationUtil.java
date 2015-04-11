@@ -1,10 +1,17 @@
 package com.example.deept_000.masproject;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by Chris on 4/6/2015.
@@ -59,7 +66,7 @@ public class LocationUtil {
         if (speed > 0 || distance > THRESHOLD_DISTANCE) {
             return true;
         }
-        return false;
+        return true;
     }
 
 
@@ -72,5 +79,23 @@ public class LocationUtil {
             mRecordedLocations = new ArrayList<Location>();
         }
         return mRecordedLocations;
+    }
+
+    public static LatLng getLocationFromAddress(String strAddress, Context context) {
+
+        Geocoder coder = new Geocoder(context);
+        List<Address> address;
+        try {
+            address = coder.getFromLocationName(strAddress, 5);
+            int address_size = address.size();
+            Address location = address.get(0);
+            location.getLatitude();
+            location.getLongitude();
+            return new LatLng(location.getLatitude(), location.getLongitude());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
