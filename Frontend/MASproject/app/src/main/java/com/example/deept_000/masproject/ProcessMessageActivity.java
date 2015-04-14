@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
+import com.google.maps.android.PolyUtil;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -53,6 +55,12 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
     String selected_route_string;
     private LatLng mDest;
     private LatLng mStart;
+    private ArrayList<Polyline> mPolyLines;
+    private Polyline[] mSelectedPolylines;
+    private final String TAG = "ProcessMessageActivity";
+    private ArrayList<String> mDurations;
+    private ArrayList<String> mSafetyScores;
+//    private ArrayList<Polyline> mPol
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,18 +201,24 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
             return;
         }
         Log.d("processFinish", mRoutes.toString());
-        TextView[] routeViews = {(TextView) findViewById(R.id.tvRoute1),
-                (TextView) findViewById(R.id.tvRoute2),
-                (TextView) findViewById(R.id.tvRoute3)};
+        TextView[] routeViews = {};//(TextView) findViewById(R.id.tvRoute1), (TextView) findViewById(R.id.tvRoute2), (TextView) findViewById(R.id.tvRoute3)
         int routeNo = 0;
-        int[] colors = {0xFF99CC00, 0xFF669900, 0xFFFFBB33, 0xFFFF8800, 0xFFFF4444, 0xFFCC0000};
+        mPolyLines = new ArrayList<Polyline>();
         candidates = new ArrayList<ArrayList<LatLng>>();
+        mSelectedPolylines = new Polyline[2];
+        mDurations = new ArrayList<String>();
+        mSafetyScores = new ArrayList<String>();
+        int bestScore = Integer.MIN_VALUE;
+
         for (Routes.Response.Route r : mRoutes.response.routes) {
             ArrayList<LatLng> ll = new ArrayList<LatLng>();
-            routeViews[routeNo].setVisibility(View.VISIBLE);
+            //routeViews[routeNo].setVisibility(View.VISIBLE);
             PolylineOptions wayOptions = new PolylineOptions();
+            int tempScore = Integer.MIN_VALUE;
             for (Route.Leg leg : r.legs) {
-                routeViews[routeNo].setText(leg.duration.text + "\nScore: " + ((int) mRoutes.response.score[routeNo]));
+                mDurations.add(leg.duration.text);
+                mSafetyScores.add(Integer.toString((int) mRoutes.response.score[routeNo]));
+                tempScore = (int) mRoutes.response.score[routeNo];
                 Route.Leg.Step step;
                 for (int j = 0; j < leg.steps.length - 1; j++) {
                     step = leg.steps[j];
@@ -215,15 +229,31 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
                 wayOptions.add(new LatLng(step.end_location.lat, step.end_location.lng));
                 ll.add(new LatLng(step.end_location.lat, step.end_location.lng));
             }
+            // add the polylines to the map
             candidates.add(ll);
-            wayOptions.color(colors[2 * routeNo])
+            wayOptions.color(getResources().getColor(R.color.route_grey_main))
                     .width(17)
-                    .zIndex(2 * (routeViews.length - routeNo));
-            Polyline polyLine = googleMap.addPolyline(wayOptions);
-            wayOptions.color(colors[2 * routeNo + 1])
+                    .zIndex(2 * (3 - routeNo));
+            Polyline main = googleMap.addPolyline(wayOptions);
+            wayOptions.color(getResources().getColor(R.color.route_grey_border))
                     .width(25)
-                    .zIndex(2 * (routeViews.length - routeNo) - 1);
-            Polyline polyLine2 = googleMap.addPolyline(wayOptions);
+                    .zIndex(2 * (3 - routeNo) - 1);
+            Polyline border = googleMap.addPolyline(wayOptions);
+
+            mPolyLines.add(main);
+            mPolyLines.add(border);
+            if (tempScore > bestScore) {
+                if (routeNo == 0) {
+                    main.setColor(getResources().getColor(R.color.bright_purple));
+                    border.setColor(getResources().getColor(R.color.purple));
+                    mSelectedPolylines[0] = main;
+                    mSelectedPolylines[1] = border;
+                    setRouteInfoText();
+                } else {
+                    switchRoutes(routeNo);
+                }
+                bestScore = tempScore;
+            }
             routeNo++;
         }
 
@@ -233,141 +263,83 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
                 .build();
         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(route, 300));
 
-//        try {
-//            JSONObject top = new JSONObject(output); // outer bracket
-//            JSONArray routes = top.getJSONObject("response").getJSONArray("routes");
-//            final JSONArray scores = top.getJSONObject("response").getJSONArray("score");
-//            JSONArray route_indices = top.getJSONObject("response").getJSONArray("route_index");
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Log.d(TAG, "onMapClick");
+                for (ArrayList<LatLng> polyline : candidates) {
+                    if (PolyUtil.isLocationOnPath(latLng, polyline, false, 50)) {
+                        Log.d(TAG, "location is on path: " + candidates.indexOf(polyline));
+                        int index = candidates.indexOf(polyline);
+                        switchRoutes(index);
+//                        Polyline main = mPolyLines.get(2 * index);
+//                        Polyline border = mPolyLines.get(2 * index + 1);
 //
-//            candidates = new ArrayList<ArrayList<LatLng>>();
-//            for (int i = 0; i < routes.length(); ++i) {
-//                JSONObject curr_route_total = routes.getJSONObject(i);
-//                JSONArray legs = curr_route_total.getJSONArray("legs");
-//                JSONArray steps = legs.getJSONObject(0).getJSONArray("steps"); // assume no waypoints
+//                        main.setColor(getResources().getColor(R.color.bright_purple));
+//                        border.setColor(getResources().getColor(R.color.purple));
 //
-//                candidates.add(new ArrayList<LatLng>());
-//                int candidates_tail = candidates.size() - 1;
+//                        // Switch update the currently selected route, switching it with the previous current
+//                        float mainZIndex, borderZIndex;
+//                        mSelectedPolylines[0].setColor(getResources().getColor(R.color.route_grey_main));
+//                        mainZIndex = mSelectedPolylines[0].getZIndex();
+//                        mSelectedPolylines[0].setZIndex(main.getZIndex());
+//                        main.setZIndex(mainZIndex);
+//                        mSelectedPolylines[0] = main;
 //
-//                for (int j = 0; j < steps.length(); ++j) {
-//                    JSONObject curr_step_total = steps.getJSONObject(j);
-//                    JSONObject curr_step_start = curr_step_total.getJSONObject("start_location");
-//                    JSONObject curr_step_end = curr_step_total.getJSONObject("end_location");
+//                        mSelectedPolylines[1].setColor(getResources().getColor(R.color.route_grey_border));
+//                        borderZIndex = mSelectedPolylines[1].getZIndex();
+//                        mSelectedPolylines[1].setZIndex(border.getZIndex());
+//                        border.setZIndex(borderZIndex);
+//                        mSelectedPolylines[1] = border;
 //
-//                    double start_lat = curr_step_start.getDouble("lat");
-//                    double start_lng = curr_step_start.getDouble("lng");
-//                    LatLng leg_start_latlng = new LatLng(start_lat, start_lng);
-//
-//                    double end_lat = curr_step_end.getDouble("lat");
-//                    double end_lng = curr_step_end.getDouble("lng");
-//                    LatLng leg_end_latlng = new LatLng(end_lat, end_lng);
-//
-//                    candidates.get(candidates_tail).add(leg_start_latlng);
-//                    candidates.get(candidates_tail).add(leg_end_latlng);
-//                }
-//            }
-//
-//            // render all routes:
-//            int route_color = 0x8F000000;
-//            final List<PolylineOptions> mPolylines = new ArrayList<PolylineOptions>();
-//            for (int i = 0; i < candidates.size(); ++i) { // for all routes
-//                PolylineOptions wayOptions = new PolylineOptions();
-//                ArrayList<LatLng> curr_route = candidates.get(i);
-//                for (int j = 0; j < curr_route.size(); ++j) { // each step in one route
-//                    wayOptions.add(curr_route.get(j));
-//                }
-//                wayOptions.color(route_color)
-//                        .width(20)
-//                        .geodesic(true);
-//                mPolylines.add(wayOptions);
-//                route_color = route_color + 500;
-//                Polyline myRoutes = googleMap.addPolyline(wayOptions);
-//            }
-//            Log.e("mPolylines:", "" + mPolylines.size());
+//                        selected_route = index;
+//                        setRouteInfoText();
 
-        // Code for selecting route by clicking on it
-//            selected_route = 0;
-//            best_score = 0;
-//            chosen_index = route_indices.getInt(0);
-//            selected_route_string = route_indices.getString(0);
-//            googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-//                @Override
-//                public void onMapClick(LatLng clickCoords) {
-//                    boolean flag = true;
-//                    for (PolylineOptions polyline : mPolylines) {
-//
-//                        for (LatLng polyCoords : polyline.getPoints()) {
-//                            float[] results = new float[1];
-//                            Location.distanceBetween(clickCoords.latitude, clickCoords.longitude,
-//                                    polyCoords.latitude, polyCoords.longitude, results);
-//
-//                            if (results[0] < 100) {
-//                                // If distance is less than 100 meters, this is your polyline
-//                                Log.e("processFinish", "Found @ " + clickCoords.latitude + " " + clickCoords.longitude);
-//                                //Log.e("processFinish", "mPolyline index:" + selected_route_id);
-//                                if (flag) {
-//                                    best_score = selected_route_id;
-//                                    flag = false;
-//                                }
-//                                try {
-//
-//                                    if (scores.getDouble(selected_route_id) > scores.getDouble(best_score))
-//                                        best_score = selected_route_id;
-//                                } catch (JSONException e) {
-//                                    e.printStackTrace();
-//                                }
-//
-//
-//                            }
-//                        }
-//                        selected_route_id++;
-//                    }
-//                }
-//            });
-
-//            selected_route_id = best_score;
-//            selected_route = best_score;
-//            chosen_index = route_indices.getInt(best_score);
-
-        Log.e("id pick:", "" + selected_route_id);
+                    }
+                }
+            }
+        });
     }
 
+    public void switchRoutes(int index) {
+        Polyline main = mPolyLines.get(2 * index);
+        Polyline border = mPolyLines.get(2 * index + 1);
+
+        main.setColor(getResources().getColor(R.color.bright_purple));
+        border.setColor(getResources().getColor(R.color.purple));
+        float mainZIndex, borderZIndex;
+        mSelectedPolylines[0].setColor(getResources().getColor(R.color.route_grey_main));
+        mainZIndex = mSelectedPolylines[0].getZIndex();
+        mSelectedPolylines[0].setZIndex(main.getZIndex());
+        main.setZIndex(mainZIndex);
+        mSelectedPolylines[0] = main;
+
+        mSelectedPolylines[1].setColor(getResources().getColor(R.color.route_grey_border));
+        borderZIndex = mSelectedPolylines[1].getZIndex();
+        mSelectedPolylines[1].setZIndex(border.getZIndex());
+        border.setZIndex(borderZIndex);
+        mSelectedPolylines[1] = border;
+
+        selected_route = index;
+        setRouteInfoText();
+    }
+
+    public void setRouteInfoText() {
+        TextView duration = (TextView) findViewById(R.id.tvDuration);
+        TextView safety = (TextView) findViewById(R.id.tvSafetyScore);
+        RelativeLayout layout = (RelativeLayout) findViewById(R.id.selectRouteInfo);
+
+        duration.setText(mDurations.get(selected_route));
+        safety.setText("Safety score: " + mSafetyScores.get(selected_route));
+        layout.setVisibility(View.VISIBLE);
+    }
 
     public void startNavigation(View view) {
         Intent intent = new Intent(this, Navigation.class);
-        //String route_id = Integer.toString(chosen_index);
-        Log.v("startNavigation", "PM selected route is " + selected_route_string);
-        intent.putExtra("selected_route_id", selected_route_string);
+        String routeId = Long.toString(mRoutes.response.route_index[selected_route]);
+        intent.putExtra("selected_route_id", routeId);
+
         ArrayList<LatLng> route = candidates.get(selected_route);
-        intent.putParcelableArrayListExtra("selected_route", route);
-        startActivity(intent);
-    }
-
-    public void navigateRouteA(View view) {
-        Intent intent = new Intent(this, Navigation.class);
-        String routeId = Long.toString(mRoutes.response.route_index[0]);
-        intent.putExtra("selected_route_id", routeId);
-
-        ArrayList<LatLng> route = candidates.get(0);
-        intent.putParcelableArrayListExtra("selected_route", route);
-        startActivity(intent);
-    }
-
-    public void navigateRouteB(View view) {
-        Intent intent = new Intent(this, Navigation.class);
-        String routeId = Long.toString(mRoutes.response.route_index[1]);
-        intent.putExtra("selected_route_id", routeId);
-
-        ArrayList<LatLng> route = candidates.get(1);
-        intent.putParcelableArrayListExtra("selected_route", route);
-        startActivity(intent);
-    }
-
-    public void navigateRouteC(View view) {
-        Intent intent = new Intent(this, Navigation.class);
-        String routeId = Long.toString(mRoutes.response.route_index[2]);
-        intent.putExtra("selected_route_id", routeId);
-
-        ArrayList<LatLng> route = candidates.get(2);
         intent.putParcelableArrayListExtra("selected_route", route);
         startActivity(intent);
     }

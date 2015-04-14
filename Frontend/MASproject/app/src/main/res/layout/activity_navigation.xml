@@ -40,33 +40,5 @@
             android:onClick="endNavigation"
             fab:fab_colorNormal="@color/alert_red"
             fab:fab_icon="@drawable/ic_clear_white_24dp" />
-
-        <!--<Button-->
-        <!--android:id="@+id/button2"-->
-        <!--android:layout_width="100dp"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_marginLeft="30dp"-->
-        <!--android:layout_marginRight="40dp"-->
-        <!--android:background="#fff62afd"-->
-        <!--android:clickable="true"-->
-        <!--android:gravity="center"-->
-        <!--android:onClick="reportConditions"-->
-        <!--android:text="Report"-->
-        <!--android:textSize="13dp" />-->
-
-        <!--<Button-->
-        <!--android:id="@+id/button3"-->
-        <!--android:layout_width="100dp"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_marginRight="30dp"-->
-        <!--android:background="#ff5a5399"-->
-        <!--android:clickable="true"-->
-        <!--android:gravity="center"-->
-        <!--android:onClick="endNavigation"-->
-        <!--android:text="Stop"-->
-        <!--android:textSize="13dp" />-->
-
     </LinearLayout>
 </FrameLayout>

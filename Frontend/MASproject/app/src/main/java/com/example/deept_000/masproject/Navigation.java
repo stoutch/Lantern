@@ -220,55 +220,6 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
                 });
         AlertDialog report_dialog = builder.create();
 
-            /*
-            LinearLayout lighting = (LinearLayout) report_dialog.findViewById(R.id.lighting_layout);
-            lighting.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //send lighting update to server - right now as -4
-                    //
-                    try {
-                        //Get current location
-                        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                        Criteria criteria = new Criteria();
-                        String bestProvider = locationManager.getBestProvider(criteria, true);
-                        Location location = locationManager.getLastKnownLocation(bestProvider);
-                        if (location == null) {
-                            //Fail - display alert saying couldn't get location
-                            return;
-                        }
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        String location_string = "lat="+ Double.toString(latitude)+"&lng=" + Double.toString(longitude);
-                        String url = serverURL+"heatmaps/negative?"+ location_string + "&type=lighting&value=4";
-                        AsyncPostData post_rating = new AsyncPostData();
-                        post_rating.execute(url);
-                       // post_rating.delegate = this;
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            */
-
-        //LinearLayout police_tower = (LinearLayout) findViewById(R.id.police_tower_layout);
-        /*police_tower.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //send police tower update to server
-                System.out.println("Clicked police tower");
-            }
-        });
-        LinearLayout road_closure = (LinearLayout) findViewById(R.id.police_station_layout);
-        road_closure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //send road closure update to server
-            }
-        });
-        */
-
         report_dialog.show();
 
     }

@@ -30,4 +30,6 @@
     <color name="alert_red">#FF0043</color>
     <color name="bright_purple">#BB77EE</color>
     <color name="purple">#893ec7</color>
+    <color name="route_grey_main">#D2D2D2</color>
+    <color name="route_grey_border">#AEAEAE</color>
 </resources>

@@ -139,7 +139,7 @@ public class HeatmapProvider {
             Gradient gradient = new Gradient(colors, startPoints);
             mProvider = new HeatmapTileProvider.Builder().weightedData(list).radius(RADIUS).opacity(OPACITY).gradient(gradient).build();
         }
-        mGoogleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        mGoogleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider)).setZIndex(10);
     }
 
     /**

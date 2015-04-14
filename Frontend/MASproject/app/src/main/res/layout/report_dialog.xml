@@ -87,7 +87,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Cancel"
-        android:textColor="@color/bright_purple" />
+        android:textColor="@color/bright_purple"
+        android:textStyle="bold" />
 
     <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
     <!--android:layout_margin="6dp"-->

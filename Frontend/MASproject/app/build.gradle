@@ -30,5 +30,4 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.melnykov:floatingactionbutton:1.2.0'
     compile 'com.getbase:floatingactionbutton:1.9.0'
-    compile project(':PersistentSearch-master')
 }
