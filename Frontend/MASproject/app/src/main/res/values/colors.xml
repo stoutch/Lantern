@@ -26,10 +26,11 @@
     <color name="blue_semi_transparent">#805677fc</color>
     <color name="blue_semi_transparent_pressed">#80738ffe</color>
     <color name="bright_blue">#00BBD3</color>
-    <color name="darker_blue">#00A9C0</color>
+    <color name="darker_blue">#0096A6</color>
     <color name="alert_red">#FF0043</color>
     <color name="bright_purple">#BB77EE</color>
     <color name="purple">#893ec7</color>
     <color name="route_grey_main">#D2D2D2</color>
     <color name="route_grey_border">#AEAEAE</color>
+    <color name="divider_color">#ffd5d5d5</color>
 </resources>

@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -322,6 +323,11 @@ public class InitialMapActivity extends ActionBarActivity implements GoogleApiCl
         String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&type=police_tower&value=10", ADDRESS, lat, lng);
         HttpPostTask httpPostTask = new HttpPostTask();
         httpPostTask.execute(uri);
+    }
+
+    public void call911(View view) {
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:911"));
+        startActivity(intent);
     }
 
 //    public Location getLastLocation() {

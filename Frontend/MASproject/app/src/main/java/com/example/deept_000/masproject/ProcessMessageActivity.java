@@ -272,29 +272,6 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
                         Log.d(TAG, "location is on path: " + candidates.indexOf(polyline));
                         int index = candidates.indexOf(polyline);
                         switchRoutes(index);
-//                        Polyline main = mPolyLines.get(2 * index);
-//                        Polyline border = mPolyLines.get(2 * index + 1);
-//
-//                        main.setColor(getResources().getColor(R.color.bright_purple));
-//                        border.setColor(getResources().getColor(R.color.purple));
-//
-//                        // Switch update the currently selected route, switching it with the previous current
-//                        float mainZIndex, borderZIndex;
-//                        mSelectedPolylines[0].setColor(getResources().getColor(R.color.route_grey_main));
-//                        mainZIndex = mSelectedPolylines[0].getZIndex();
-//                        mSelectedPolylines[0].setZIndex(main.getZIndex());
-//                        main.setZIndex(mainZIndex);
-//                        mSelectedPolylines[0] = main;
-//
-//                        mSelectedPolylines[1].setColor(getResources().getColor(R.color.route_grey_border));
-//                        borderZIndex = mSelectedPolylines[1].getZIndex();
-//                        mSelectedPolylines[1].setZIndex(border.getZIndex());
-//                        border.setZIndex(borderZIndex);
-//                        mSelectedPolylines[1] = border;
-//
-//                        selected_route = index;
-//                        setRouteInfoText();
-
                     }
                 }
             }
@@ -330,7 +307,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.selectRouteInfo);
 
         duration.setText(mDurations.get(selected_route));
-        safety.setText("Safety score: " + mSafetyScores.get(selected_route));
+        safety.setText(mSafetyScores.get(selected_route));
         layout.setVisibility(View.VISIBLE);
     }
 

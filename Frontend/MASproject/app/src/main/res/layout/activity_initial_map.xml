@@ -35,6 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_gravity="bottom|right"
+            android:onClick="call911"
             fab:fab_colorNormal="@color/alert_red"
             fab:fab_icon="@drawable/ic_error_cropped" />
 
