@@ -4,8 +4,8 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.util.Log;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
@@ -39,18 +39,20 @@ public class LocationUtil {
      */
     private static ArrayList<Location> mRecordedLocations;
 
+    public static GoogleApiClient mGoogleApiClient;
+
     public static void updateLocation(Location location) {
         mLastLocation = location;
         Calendar c = Calendar.getInstance();
         mLastLocationTime = c.getTimeInMillis();
         // add time checks to see if we should actually update
         // check if the new location is far enough away too
-        Log.d("updateLocation", "Speed:" + location.getSpeed());
+//        Log.d("updateLocation", "Speed:" + location.getSpeed());
         if (mRecordedLocations == null) {
             mRecordedLocations = new ArrayList<Location>();
         }
         if (shouldAddLocation(location)) {
-            Log.d("updateLocation", "Adding location");
+//            Log.d("updateLocation", "Adding location");
             mLastAddedLocation = mLastLocation;
             mRecordedLocations.add(mLastLocation);
         }
@@ -66,7 +68,7 @@ public class LocationUtil {
         if (speed > 0 || distance > THRESHOLD_DISTANCE) {
             return true;
         }
-        return true;
+        return false;
     }
 
 

@@ -4,12 +4,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +20,8 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.deept_000.masproject.web.HttpSender;
+import com.example.deept_000.masproject.web.WebResponseListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -61,6 +63,9 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.navToolbar);
+        setSupportActionBar(toolbar);
+        toolbar.inflateMenu(R.menu.menu_navigation);
         try {
             //selected_route = Integer.parseInt(getIntent().getStringExtra("selected_route_id"));
             selected_route_string = getIntent().getStringExtra("selected_route_id");
@@ -130,7 +135,7 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
                     LatLng tech = new LatLng(33.775635, -84.396444);
                     googleMap.setMyLocationEnabled(true);
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tech, 15));
-                    provider.addHeatmap(googleMap, getLastLocation());
+                    provider.addHeatmap(googleMap, LocationUtil.getLastLocation());
                     Marker marker = googleMap.addMarker(new MarkerOptions()
                             .position(route.get(0))
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_marker_34dp)));
@@ -146,7 +151,7 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
             googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
             // Check if we were successful in obtaining the map.
             if (googleMap != null) {
-                provider.addHeatmap(googleMap, getLastLocation());
+                provider.addHeatmap(googleMap, LocationUtil.getLastLocation());
                 //addHeatmap();
             }
         }
@@ -306,13 +311,18 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
     }
 
     private void sendPoliceRating() {
-        Location location = getLastLocation();
+        Location location = LocationUtil.getLastLocation();
         double lat = location.getLatitude();
         double lng = location.getLongitude();
         int radius = 2500;
         String uri = String.format("%s/heatmaps/positive?lat=%f&lng=%f&type=police_tower&value=10", ADDRESS, lat, lng);
         HttpPostTask httpPostTask = new HttpPostTask();
         httpPostTask.execute(uri);
+    }
+
+    public void call911(View view) {
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:911"));
+        startActivity(intent);
     }
 
     private class HttpPostTask extends AsyncTask<String, Integer, HttpResponse> {
@@ -352,7 +362,6 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
             public void onClick(View v) {
                 RatingBar rb = (RatingBar) dialog.findViewById(R.id.ratingBar);
                 int rating = (int) rb.getRating();
-                System.out.println("Clicked done, rating: " + rating);
                 dialog.dismiss();
                 sendRating(rating);
                 Intent intent = new Intent(getApplicationContext(), InitialMapActivity.class);
@@ -373,8 +382,24 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
 
     public void sendRating(int rating) {
         //Filler material for now
-        HttpGetTask httpGet = new HttpGetTask();
-        httpGet.execute("http://173.236.254.243:8080/heatmaps/positive?lat=32.725371&lng=%20-117.160721&radius=2500&total=2");
+        HttpSender sender = new HttpSender();
+        String uri = String.format("http://173.236.254.243:8080/routes/rate/%s?rating=%d&day=true", selected_route_string, rating);
+        sender.sendHttpRequest(uri, "", "POST", new WebResponseListener() {
+            @Override
+            public void OnSuccess(String response, String... params) {
+
+            }
+
+            @Override
+            public void OnError(Exception e, String... params) {
+
+            }
+
+            @Override
+            public void OnProcessing() {
+
+            }
+        });
     }
 
     private class HttpGetTask extends AsyncTask<String, Integer, HttpResponse> {
@@ -418,13 +443,6 @@ public class Navigation extends ActionBarActivity implements AsyncResponse {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public Location getLastLocation() {
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        String bestProvider = locationManager.getBestProvider(criteria, true);
-        return locationManager.getLastKnownLocation(bestProvider);
     }
 
     public void processFinish(String output) {

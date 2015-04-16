@@ -2,24 +2,26 @@ package com.example.deept_000.masproject;
 
 import android.app.Dialog;
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.SearchRecentSuggestions;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.deept_000.masproject.service.GetLocationReceiver;
 import com.example.deept_000.masproject.service.SendLocationReceiver;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.common.ConnectionResult;
@@ -61,32 +63,45 @@ public class InitialMapActivity extends ActionBarActivity implements GoogleApiCl
     public final static String EXTRA_MESSAGE = "com.example.deept_000.MESSAGE";
     private String mDestination;
     private Marker mCurrentMarker;
+    private final String PREFS_NAME = "suggestions";
+    private final String KEY_PREFIX = "search_suggestion";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_initial_map);
-
-        buildGoogleApiClient();
+        setUpMapIfNeeded();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.initMapToolbar);
+        setSupportActionBar(toolbar);
+        //buildGoogleApiClient();
         //setUpMapIfNeeded();
 
         SendLocationReceiver alarm = new SendLocationReceiver();
-        //GetLocationReceiver alarm = new GetLocationReceiver();
+        GetLocationReceiver alarm2 = new GetLocationReceiver();
         alarm.setAlarm(this);
+        alarm2.setAlarm(this);
+
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        getSupportActionBar().setIcon(R.mipmap.ic_launcher);
+        toolbar.inflateMenu(R.menu.menu_initial_map);
+
+
+        Intent intent = getIntent();
+        handleIntent(intent);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
+        //mGoogleApiClient.connect();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
+//        if (mGoogleApiClient.isConnected()) {
+//            mGoogleApiClient.disconnect();
+//        }
     }
 
     @Override
@@ -98,13 +113,23 @@ public class InitialMapActivity extends ActionBarActivity implements GoogleApiCl
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.options_menu, menu);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-            searchView.setIconifiedByDefault(false);
-        }
+//        getMenuInflater().inflate(R.menu.options_menu, menu);
+//        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+//            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+//            searchView.setIconifiedByDefault(false);
+//        }
+//        int searchPlateId = searchView.getContext().getResources().getIdentifier("android:id/search_plate",null, null);
+//        View searchPlate = searchView.findViewById(searchPlateId);
+//        if(searchPlate != null){
+//            int searchTextId = searchPlate.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+//            TextView searchText = (TextView) searchPlate.findViewById(searchTextId);
+//            if (searchText!=null) {
+//                searchText.setTextColor(Color.WHITE);
+//                searchText.setHintTextColor(Color.WHITE);
+//            }
+//        }
         return true;
     }
 
@@ -137,26 +162,51 @@ public class InitialMapActivity extends ActionBarActivity implements GoogleApiCl
             System.out.println("doing Action Search");
             // handles a search query
             mDestination = intent.getStringExtra(SearchManager.QUERY);
-            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
-                    SuggestionProvider.AUTHORITY, SuggestionProvider.MODE);
-            suggestions.saveRecentQuery(mDestination, null);
+
+            boolean newSearch = intent.getBooleanExtra("new_search", true);
+            if (newSearch) {
+                SharedPreferences settings = getApplicationContext().getSharedPreferences(PREFS_NAME, 0);
+                int index = settings.getInt("recent_index", 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString(KEY_PREFIX + index, mDestination);
+                editor.putInt("recent_index", index + 1);
+                editor.commit();
+            }
+
+
+//            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+//                    SuggestionProvider.AUTHORITY, SuggestionProvider.MODE);
+//            suggestions.saveRecentQuery(mDestination, null);
 
             FloatingActionButton report = (FloatingActionButton) findViewById(R.id.fabReport);
             FloatingActionButton panic = (FloatingActionButton) findViewById(R.id.fabPanic);
             FloatingActionButton nav = (FloatingActionButton) findViewById(R.id.fabNavigate);
+            LinearLayout search = (LinearLayout) findViewById(R.id.search_container);
+            RelativeLayout destination = (RelativeLayout) findViewById(R.id.destLayout);
+            TextView dest = (TextView) findViewById(R.id.tvDestination);
+
+            dest.setText(mDestination);
+            destination.setVisibility(View.VISIBLE);
             report.setVisibility(View.GONE);
             panic.setVisibility(View.GONE);
-            nav.setVisibility(View.VISIBLE);
+            search.setVisibility(View.GONE);
+            // nav.setVisibility(View.VISIBLE);
 
-            LatLng loc = LocationUtil.getLocationFromAddress(mDestination, this);
-            if (mCurrentMarker != null) {
-                mCurrentMarker.remove();
+
+            try {
+                LatLng loc = LocationUtil.getLocationFromAddress(mDestination, this);
+                if (mCurrentMarker != null) {
+                    mCurrentMarker.remove();
+                }
+                mCurrentMarker = googleMap.addMarker(new MarkerOptions()
+                        .position(loc)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_marker_34dp)));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
+            } catch (Exception e) {
+                Toast toast = Toast.makeText(InitialMapActivity.this, "Could not find destination", Toast.LENGTH_SHORT);
+                toast.show();
             }
 
-            mCurrentMarker = googleMap.addMarker(new MarkerOptions()
-                    .position(loc)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_marker_34dp)));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
         }
     }
 
@@ -226,7 +276,7 @@ public class InitialMapActivity extends ActionBarActivity implements GoogleApiCl
     }
 
     public void inputDestination(View view) {
-        Intent intent = new Intent(this, InputActivity.class);
+        Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
         startActivity(intent);
     }
 

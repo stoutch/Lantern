@@ -40,7 +40,8 @@ public class GetLocationReceiver extends WakefulBroadcastReceiver {
 
         // Set the alarm to now and at 15 second intervals
         //alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, 20 * 1000, alarmIntent);
-        alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5 * 1000, 15 * 1000, alarmIntent);
+        //alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 15 * 1000, alarmIntent);
+        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), alarmIntent);
 
         // Enable {@code SampleBootReceiver} to automatically restart the alarm when the
         // device is rebooted.

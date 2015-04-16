@@ -1,12 +1,11 @@
 package com.example.deept_000.masproject;
 
 import android.content.Intent;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -65,12 +64,15 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_process_message);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.routesToolbar);
+        setSupportActionBar(toolbar);
+        toolbar.inflateMenu(R.menu.menu_process_message);
 
         Intent intent = getIntent();
         String message = intent.getStringExtra(InputActivity.EXTRA_MESSAGE);
         /* Destination: */
         mDest = LocationUtil.getLocationFromAddress(message, this); // 33.772579, -84.394822
-        setContentView(R.layout.activity_process_message);
         selected_route = 0;
         setUpMapIfNeeded();
 
@@ -78,10 +80,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
         Location l = LocationUtil.getLastLocation();
         mStart = new LatLng(l.getLatitude(), l.getLongitude());//new LatLng(33.777482, -84.397300);
 
-
         getDirections(mStart.latitude, mStart.longitude, mDest.latitude, mDest.longitude);
-
-
     }
 
 
@@ -96,19 +95,11 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
                 if (googleMap != null) {
                     googleMap.setMyLocationEnabled(true);
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mDest, 15));
-                    //addHeatMap();
                     /* Location Manager: */
-                    LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                    Criteria criteria = new Criteria();
-                    String bestProvider = locationManager.getBestProvider(criteria, true);
-                    Location location = locationManager.getLastKnownLocation(bestProvider);
-                    provider.addHeatmap(googleMap, location);
+                    provider.addHeatmap(googleMap, LocationUtil.getLastLocation());
                     Marker marker = googleMap.addMarker(new MarkerOptions()
                             .position(mDest)
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_marker_34dp)));
-                    //current = new LatLng(location.getAltitude(), location.getLongitude());
-
-                    //locationManager.requestLocationUpdates(bestProvider, 20000, 0, this);
                 }
             }
         } catch (Exception e) {
@@ -119,12 +110,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
             googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
             // Check if we were successful in obtaining the map.
             if (googleMap != null) {
-                LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                Criteria criteria = new Criteria();
-                String bestProvider = locationManager.getBestProvider(criteria, true);
-                Location location = locationManager.getLastKnownLocation(bestProvider);
-                provider.addHeatmap(googleMap, location);
-                //addHeatMap();
+                provider.addHeatmap(googleMap, LocationUtil.getLastLocation());
             }
         }
     }
@@ -146,7 +132,6 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
             e.printStackTrace();
         }
     }
-
 
     private class AsyncPostData extends AsyncTask<String, Void, String> { // last variable: return value of doInBackground
 
@@ -183,11 +168,11 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
             errorToast.show();
         }
         return result;
-
     }
 
     @Override
     public void processFinish(String output) {
+        Log.d(TAG, output);
         ProgressBar pbRoute = (ProgressBar) findViewById(R.id.pbRoute);
         pbRoute.setVisibility(View.GONE);
         Log.i("in processFinish:", output);
@@ -211,8 +196,7 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
         int bestScore = Integer.MIN_VALUE;
 
         for (Routes.Response.Route r : mRoutes.response.routes) {
-            ArrayList<LatLng> ll = new ArrayList<LatLng>();
-            //routeViews[routeNo].setVisibility(View.VISIBLE);
+            ArrayList<LatLng> latLngList = new ArrayList<LatLng>();
             PolylineOptions wayOptions = new PolylineOptions();
             int tempScore = Integer.MIN_VALUE;
             for (Route.Leg leg : r.legs) {
@@ -223,14 +207,14 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
                 for (int j = 0; j < leg.steps.length - 1; j++) {
                     step = leg.steps[j];
                     wayOptions.add(new LatLng(step.start_location.lat, step.start_location.lng));
-                    ll.add(new LatLng(step.start_location.lat, step.start_location.lng));
+                    latLngList.add(new LatLng(step.start_location.lat, step.start_location.lng));
                 }
                 step = leg.steps[leg.steps.length - 1];
                 wayOptions.add(new LatLng(step.end_location.lat, step.end_location.lng));
-                ll.add(new LatLng(step.end_location.lat, step.end_location.lng));
+                latLngList.add(new LatLng(step.end_location.lat, step.end_location.lng));
             }
             // add the polylines to the map
-            candidates.add(ll);
+            candidates.add(latLngList);
             wayOptions.color(getResources().getColor(R.color.route_grey_main))
                     .width(17)
                     .zIndex(2 * (3 - routeNo));

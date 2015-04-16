@@ -24,8 +24,11 @@
         <item name="android:background">@drawable/floating_label_background_c</item>
         <item name="android:textColor">@color/white</item>
     </style>
+
+    <!--<style name="ActionBarToolBarStyle" parent="@style/Theme.AppCompat.Light.NoActionBar"-->
+
     <!-- the theme applied to the application or activity -->
-    <style name="CustomActionBarTheme" parent="@style/Theme.AppCompat.Light">
+    <style name="CustomActionBarTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
         <item name="android:actionBarTabTextStyle">@style/TabTextStyle</item>
         <item name="android:actionMenuTextColor">@color/white</item>
@@ -33,7 +36,12 @@
 
         <item name="colorPrimary">@color/bright_blue</item>
         <item name="colorPrimaryDark">@color/darker_blue</item>
-        <!--<item name="colorAccent">@color/white</item>-->
+        <!--<item name="colorControlNormal">@color/white</item>-->
+        <item name="colorAccent">@color/white</item>
+        <item name="colorControlHighlight">@color/bright_purple</item>
+        <item name="colorControlActivated">@color/bright_blue</item>
+        <item name="colorControlNormal">@color/purple</item>
+        <item name="colorSwitchThumbNormal">@color/alert_red</item>
 
         <!-- Support library compatibility -->
         <item name="actionBarStyle">@style/MyActionBar</item>
@@ -41,20 +49,51 @@
         <item name="actionMenuTextColor">@color/white</item>
     </style>
 
+    <style name="ToolbarTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- android:textColorPrimary is the  color of the title text
+             in the Toolbar, in the Theme.AppCompat theme:  -->
+        <item name="android:textColorPrimary">@color/white</item>
+
+        <!-- android:textColorPrimaryInverse is the  color of the title
+             text in the Toolbar, in the Theme.AppCompat.Light theme:  -->
+        <!-- <item name="android:textColorPrimaryInverse">@color/abc_primary_text_material_light</item> -->
+
+        <!-- android:actionMenuTextColor is the color of the text of
+              action (menu) items in the Toolbar, at least in the
+              Theme.AppCompat theme.
+              For some reason, they already get the textColorPrimary
+              when running on API 21, but not on older versions of
+              Android, so this is only necessary to support older
+              Android versions.-->
+        <item name="actionMenuTextColor">@color/white</item>
+        <!-- android:textColorSecondary is the color of the menu
+             overflow icon (three vertical dots) -->
+        <item name="android:textColorSecondary">@color/white</item>
+
+        <!-- This would set the toolbar's background color,
+              but setting this also changes the popup menu's background,
+              even if we define popupTheme for our <Toolbar> -->
+        <item name="android:background">@color/bright_blue</item>
+    </style>
+
     <!-- general styles for the action bar -->
     <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar">
         <item name="android:titleTextStyle">@style/TitleTextStyle</item>
         <item name="android:background">@color/bright_blue</item>
+        <item name="android:displayOptions">useLogo</item>
+        <item name="android:textColor">@color/white</item>
 
         <!-- Support library compatibility -->
         <item name="titleTextStyle">@style/TitleTextStyle</item>
         <item name="background">@color/bright_blue</item>
+        <item name="displayOptions">showTitle|useLogo</item>
     </style>
 
-    <style name="SearchView" parent="Widget.AppCompat.SearchView">
+    <style name="SearchView" parent="@style/Widget.AppCompat.SearchView">
         <item name="searchIcon">@drawable/ic_search_white_24dp</item>
         <item name="closeIcon">@drawable/ic_clear_white_24dp</item>
         <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextView</item>
+        <item name="android:paddingRight">20dp</item>
     </style>
 
     <style name="AutoCompleteTextView" parent="Widget.AppCompat.Light.AutoCompleteTextView">

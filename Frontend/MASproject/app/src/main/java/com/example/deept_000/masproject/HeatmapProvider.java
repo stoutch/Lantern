@@ -28,7 +28,7 @@ public class HeatmapProvider {
     private GoogleMap mGoogleMap;
     private double mLat;
     private double mLong;
-    private final int MAP_RADIUS = 2500;
+    private final int MAP_RADIUS = 15000;
 
     /**
      * Adds a heatmap to the map

@@ -18,8 +18,14 @@ public class Routes {
             public class Leg {
                 public Step[] steps;
                 public LegDuration duration;
+                public LegDistance distance;
 
                 public class LegDuration {
+                    public String text;
+                    public int value;
+                }
+
+                public class LegDistance{
                     public String text;
                     public int value;
                 }

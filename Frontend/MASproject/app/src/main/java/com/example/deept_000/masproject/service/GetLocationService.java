@@ -63,8 +63,8 @@ public class GetLocationService extends IntentService implements
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-        mGoogleApiClient.connect();
         createLocationRequest();
+        mGoogleApiClient.connect();
     }
 
     public Location getLastLocation() {
@@ -128,6 +128,7 @@ public class GetLocationService extends IntentService implements
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d(TAG, "onLocationChanged");
         LocationUtil.updateLocation(location);
         mCurrentLocation = location;
     }

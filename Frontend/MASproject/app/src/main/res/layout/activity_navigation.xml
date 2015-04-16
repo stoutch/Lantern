@@ -14,31 +14,73 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
+    <android.support.v7.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/navToolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom|right"
-        android:gravity="bottom|right"
-        android:orientation="vertical">
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        android:minHeight="?attr/actionBarSize"
+        app:theme="@style/ToolbarTheme"></android.support.v7.widget.Toolbar>
 
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabReport"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="bottom|right"
-            android:onClick="reportConditions"
-            fab:fab_colorNormal="@color/bright_purple"
-            fab:fab_icon="@drawable/ic_flag_white_24dp" />
+    <RelativeLayout
+        android:id="@+id/selectRouteInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="190dp"
+        android:layout_gravity="bottom"
+        android:gravity="bottom"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/navInfo"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_gravity="bottom|center"
+            android:background="@color/white"
+            android:onClick="endNavigation"
+            android:orientation="vertical"
+            android:paddingBottom="15dp"
+            android:paddingLeft="20dp"
+            android:paddingTop="15dp">
+
+            <TextView
+                android:id="@+id/tvDuration"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableLeft="@drawable/ic_clear_black_24dp"
+                android:drawablePadding="10dp"
+                android:gravity="left|center_vertical"
+                android:text="Cancel Navigation"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@android:color/black" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignTop="@id/navInfo"
+            android:background="@color/divider_color" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabPanic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="bottom|right"
-            android:onClick="endNavigation"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/navInfo"
+            android:layout_marginTop="-32dp"
+            android:onClick="call911"
             fab:fab_colorNormal="@color/alert_red"
-            fab:fab_icon="@drawable/ic_clear_white_24dp" />
-    </LinearLayout>
+            fab:fab_icon="@drawable/ic_police2" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabReport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/fabPanic"
+            android:layout_marginTop="-72dp"
+            android:onClick="reportConditions"
+            fab:fab_colorNormal="@color/bright_purple"
+            fab:fab_icon="@drawable/ic_flag_white_24dp" />
+    </RelativeLayout>
 </FrameLayout>

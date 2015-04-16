@@ -12,6 +12,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,6 +48,10 @@ public class StartActivity extends ActionBarActivity implements GoogleApiClient.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.loginToolbar);
+        setSupportActionBar(toolbar);
+        toolbar.inflateMenu(R.menu.menu_start);
+
         loginLoading = (ProgressBar) findViewById(R.id.pbLogin);
         loginButton = (Button) findViewById(R.id.btnLogin);
         buildGoogleApiClient();
@@ -133,8 +138,8 @@ public class StartActivity extends ActionBarActivity implements GoogleApiClient.
             public void OnSuccess(String response, String... params) {
                 // authentication steps to be added
                 if (response.contains("\"success\": false")) {
-                    Toast toast = Toast.makeText(getApplicationContext(), "Could not log in", Toast.LENGTH_LONG);
-                    toast.show();
+//                    Toast toast = Toast.makeText(getApplicationContext(), "Could not log in", Toast.LENGTH_LONG);
+//                    toast.show();
                     hideLoading();
                     startActivity(intent);
                 } else {
