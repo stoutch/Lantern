@@ -9,10 +9,13 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        var camera = GMSCameraPosition.cameraWithLatitude(37.80948,
+                
+        
+        /*var camera = GMSCameraPosition.cameraWithLatitude(37.80948,
             longitude:5.965699, zoom:2)
         var mapView = GMSMapView.mapWithFrame(CGRectZero, camera:camera)
         
@@ -22,6 +25,7 @@ class ViewController: UIViewController {
         // Set the mapType to Satellite
         mapView.mapType = kGMSTypeSatellite
         self.view = mapView
+*/
     }
 
     override func didReceiveMemoryWarning() {
