@@ -201,8 +201,8 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
             int tempScore = Integer.MIN_VALUE;
             for (Route.Leg leg : r.legs) {
                 mDurations.add(leg.duration.text);
-                mSafetyScores.add(Integer.toString((int) mRoutes.response.score[routeNo]));
-                tempScore = (int) mRoutes.response.score[routeNo];
+                tempScore = (int) (mRoutes.response.score[routeNo] * 100);
+                mSafetyScores.add(Integer.toString(tempScore));
                 Route.Leg.Step step;
                 for (int j = 0; j < leg.steps.length - 1; j++) {
                     step = leg.steps[j];
@@ -226,7 +226,9 @@ public class ProcessMessageActivity extends ActionBarActivity implements AsyncRe
 
             mPolyLines.add(main);
             mPolyLines.add(border);
+            Log.d(TAG, "temp score: " + tempScore);
             if (tempScore > bestScore) {
+                Log.d(TAG, "best score: " + bestScore);
                 if (routeNo == 0) {
                     main.setColor(getResources().getColor(R.color.bright_purple));
                     border.setColor(getResources().getColor(R.color.purple));
