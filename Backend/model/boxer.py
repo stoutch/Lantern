@@ -5,6 +5,7 @@ create a set of bounding boxes, accessible via the boxes property.
 '''	
 
 import collections
+import config
 import itertools
 from geoutils import *
 
@@ -104,7 +105,8 @@ class grid:
 class RouteBoxer:
 	"""Class to decompose a route of points, given in lat/lng format, into a list 
 	of bounding boxes."""
-	EDGE_LENGTH = 20	# Edge length in meters
+        conf = config.envs['prod']
+	EDGE_LENGTH = conf.box_edge_size	# Edge length in meters
 	
 	def __init__(self, path, upperLeft, lowerRight):
 		self.path = path

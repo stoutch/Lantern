@@ -1,7 +1,12 @@
 from bson.objectid import ObjectId
+import logging
+from math import pow,sqrt
 from tornado.gen import Return, coroutine
 from urllib2 import urlopen
+import config
 import boxer
+import calendar
+from datetime import datetime
 from geoutils import *
 
 class _Route:
@@ -10,9 +15,100 @@ class _Route:
                                 Route
     ***************************************************************************
     '''
-
     @coroutine
     def get_route(self,idUser,destination_point,starting_point,total=50):
+        '''
+        id_user: id of the user trying to get the route.
+        destination_point: {lat:,long:} of the geographical position of the final destination.
+        starting_point: {lat:,long:} of the geographical position of the starting point
+        '''
+        result = {}
+        result = self.obtain_routes(starting_point,destination_point,"walking",True)
+        #Poins obtained from the polyline of the routes
+        points = self.obtain_point_in_routes(result)
+        routes_bbs=[]
+        routes_distances=[]
+        #Obtain the bounding boxes for the 
+        for index in range(len(result["routes"])):
+            temp = self.obtain_heatmap_slow(points[index])
+            routes_bbs.append(temp['bounding_boxes'])
+            routes_distances.append(temp['distance'])
+        new_dict = {}
+        result['heatmaps']=[]
+        new_dict['positive']=[]
+        new_dict['negative']=[]
+        result['route_index']=[]
+        result['score']=[]
+        utc_time = self.obtain_utc_time()
+        total_numerator = 0
+        total_denominator = 0
+        for routeIndex in range(len(routes_bbs)):
+            #logging.info(routeIndex)
+            #time in seconds in milliseconds
+            time = (result['routes'][routeIndex]["legs"][0]["duration"]["value"])*1000
+            #distance in meters
+            totalDistance=result['routes'][routeIndex]["legs"][0]["distance"]["value"]
+            utc_now=utc_time
+            person_index_route = utc_time+routeIndex
+            result['route_index'].append(person_index_route)
+            point1 = points[routeIndex][0]
+            for boxIndex in  range(len(routes_bbs[routeIndex])):
+                lineLength = routes_distances[routeIndex][boxIndex]
+                deltaTime = time*lineLength/totalDistance
+                utc_future = deltaTime + utc_now
+                point2 = points[routeIndex][boxIndex+1]
+                midpoint = midDistance(coordinate(point1[1],point1[0]),coordinate(point2[1],point2[0]))
+                future = self.db.persons.insert({'uid':idUser,'loc':{'type':'Point','coordinates':[float(midpoint.lng),float(midpoint.lat)]},'initial':utc_now,'finish':utc_future,'index':person_index_route,'temporal':True})
+                insert_result=yield future
+                #logging.info(person_index_route)
+                #logging.info(insert_result)
+                box = routes_bbs[routeIndex][boxIndex]
+                pos_temparray =[]
+                neg_temparray =[]
+                pos_temparray += yield self.db.positive_heatmap.find({'loc': { '$geoWithin' :{'$geometry': {"type":"Polygon","coordinates":box}}}},{"_id":0}).to_list(length=int(total))
+                pos_temparray += yield self.db.persons.find({'loc':{'$geoWithin':{'$geometry':{'type':'Polygon','coordinates':box}}},'initial':{'$gte':utc_now},'finish':{'$lte':utc_future},'uid':{'$ne':idUser},'temporal':False},{"_id":0}).to_list(length=int(total))
+                neg_temparray += yield self.db.negative_heatmap.find({'loc': { '$geoWithin' : { '$geometry' : {"type":"Polygon","coordinates":box}}}},{"_id":0}   ).to_list(length=int(total))
+                numerator = 0
+                denominator = 0
+                for pos_item in pos_temparray:
+                    if "weight" in pos_item:
+                        weight = float(pos_item["weight"])
+                        value = float(pos_item["value"])
+                        numerator += value*weight/10.0
+                        denominator += weight
+                    else:
+                        logging.info("Item does not has a weight value")
+                for neg_item in neg_temparray:
+                    if "weight" in neg_item:
+                        weight = float(neg_item["weight"])
+                        value = float(neg_item["value"])
+                        numerator += value*weight/10.0
+                        denominator += abs(neg_item["weight"])
+                    else:
+                        logging.info("Item does not has a weight value")
+                if denominator != 0:
+                    total_numerator += lineLength*numerator/denominator
+                    total_denominator += lineLength
+                new_dict['positive'] += pos_temparray
+                new_dict['negative'] += neg_temparray
+                utc_now = utc_future
+            if total_denominator !=0:
+                result['score'].append(total_numerator/total_denominator)    
+            else:
+                result['score'].append(0)
+        result['heatmaps']=(new_dict)
+        self.db.persons.create_index(config.ttl_index["people"],sparse=True,background=True,expireAfterSeconds=config.ttl_dictionary["people"])
+        self.db.persons.create_index([('loc', '2dsphere')],background=True)
+
+        raise Return(result)
+      #TODO Calculate the vlaue and the weight for each route, normalized for each route.
+        
+     
+
+
+
+    @coroutine
+    def get_route_old(self,idUser,destination_point,starting_point,total=50):
         '''
         id_user: id of the user trying to get the route.
         destination_point: {lat:,long:} of the geographical position of the final destination.
@@ -172,6 +268,7 @@ class _Route:
         * @mode: string mode of the query. E.g. walking, etc.
         * @alternatives: boolean, true or false, to obtain more than one route (if true)
         '''
+        conf = config.envs["dev"]
         http_dir = "https://maps.googleapis.com/maps/api/directions/json?"
         http_dir +=("origin="+str(origin["lat"])+","+str(origin["lng"]))
         http_dir +=("&destination="+str(destination["lat"])+","+str(destination["lng"]))
@@ -181,6 +278,7 @@ class _Route:
             http_dir += "&alternatives=true"
         else:
             http_dir += "&alternatives=false"
+	http_dir += "&key="+conf.google_api_key
         routes = eval(urlopen(http_dir).read())
         return routes
 
@@ -193,6 +291,40 @@ class _Route:
         for route in routes["routes"]:
             output.append(self.decode(route["overview_polyline"]["points"]))
         return output
+
+    def get_line_bounding_box(self,coord1,coord2):
+        point1 = coord2MercPoint(coord1)
+        point2 = coord2MercPoint(coord2)
+        Delta = point(point1.x-point2.x,point1.y-point2.y)
+        perp = point(-Delta.y,Delta.x)
+        norm = sqrt(pow(perp.x,2)+pow(perp.y,2))
+        perp_norm = point(perp.x/norm,perp.y/norm)
+        extension = point(config.envs['dev'].box_edge_size*perp_norm.x,config.envs['dev'].box_edge_size*perp_norm.y)
+        neg = point(-extension.x,-extension.y)
+        ul= point(point1.x+extension.x,point1.y+extension.y)
+        ll = point(point1.x+neg.x,point1.y+neg.y)
+        lr = point(point2.x+neg.x,point2.y+neg.y)
+        ur = point(point2.x+extension.x,point2.y+extension.y)
+        box = [[]]
+        #Create a rectangle in the multipolygon, we need 5 positions, first and last position is the same
+        box[0].append([x2lng(ul.x),y2lat(ul.y)])
+        box[0].append([x2lng(ur.x),y2lat(ur.y)])
+        box[0].append([x2lng(lr.x),y2lat(lr.y)])
+        box[0].append([x2lng(ll.x),y2lat(ll.y)])
+        box[0].append([x2lng(ul.x),y2lat(ul.y)])
+        return box
+
+    def obtain_heatmap_slow(self,points):
+        #latitude,longitude
+        point1 = coordinate(points[0][1],points[0][0])
+        bounding_boxes=[]
+        distance=[]
+        for point in points[1::]:
+            point2=coordinate(point[1],point[0])
+            bounding_boxes.append(self.get_line_bounding_box(point1,point2))
+            distance.append(coordDistance(point1,point2))
+            point1=point2
+        return {"bounding_boxes":bounding_boxes,"distance":distance}
 
     def obtain_heatmap(self,points,boundingBox):
         boundingBoxDict = {"ul":{"lat": boundingBox["northeast"]["lat"],"lng":boundingBox["southwest"]["lng"]},"lr":{"lat": boundingBox["southwest"]["lat"],"lng":boundingBox["northeast"]["lng"]}}
@@ -211,3 +343,10 @@ class _Route:
         boxes = rb.boxes()       
         boxCoords = rb.boxCoords()
         return boxCoords
+
+    def obtain_utc_time(self):
+        time_now = datetime.now()
+        if time_now.utcoffset() is not None:
+            time_now = time_now - time_now.utcoffset()
+        millis = int(calendar.timegm(time_now.timetuple())*1000+time_now.microsecond/1000)
+        return millis

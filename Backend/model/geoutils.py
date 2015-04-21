@@ -10,6 +10,18 @@ EARTH_RADIUS = 6378137
 point = collections.namedtuple('point', ['x', 'y'])
 coordinate = collections.namedtuple('coordinate', ['lat', 'lng'])
 
+def midDistance(coord1,coord2):
+    midPoint = point((lng2x(coord1.lng)+lng2x(coord2.lng))/2,(lat2y(coord1.lat)+lat2y(coord2.lat))/2)
+    return mercPoint2Coord(midPoint)
+
+def coordDistance(coord1,coord2):
+    dlon=coord2.lng-coord1.lng
+    dlat=coord2.lng-coord1.lng
+    a=(math.pow(math.sin(dlat/2),2)+math.cos(coord1.lat)*math.cos(coord2.lat)*(math.pow(math.sin(dlon/2),2)))
+    c=2*math.atan2(math.sqrt(a),math.sqrt(1-a))
+    d=EARTH_RADIUS*c
+    return math.fabs(d)
+
 def deg2rad(deg):
 	return deg * math.pi / 180.0
 	

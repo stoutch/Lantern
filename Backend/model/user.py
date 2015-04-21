@@ -29,52 +29,11 @@ class _User:
         This function look for the user that is being logged in.
         '''
         hashPass = self._hashPassword(password)
-        user_bson = yield self.db.users.find_one({'email': login, 'password': hashPass})
+        user_bson = yield self.db.users.find_one({'email': login, 'password': hashPass},{'password':0,'login_stamp':0})
         logging.info("{0}".format(user_bson))
         if user_bson is not None:
             temp = yield self.db.users.update({'_id':ObjectId(user_bson['_id'])},{'$addToSet':{'login_stamp':datetime.now()}})
             logging.info("logging stamp: {0}".format(temp))
-        raise Return(user_bson)
-
-    @coroutine
-    def login_third_party(self,login,type_login,generic_id):
-        '''
-        This function look for the user that is being logged in, with a third party platform such as facebook, twitter, etc.
-        '''
-        #The next list are the possible third_party log in, if it is needed, we need to change the list, only if we want a new plataform to be accepted.
-        logging.info(locals())
-        sanity_check = ['facebook_id','google_plus_id','twitter_id']
-        platform_id = type_login+'_id'#Get the actual id space for the current type login
-        if platform_id in sanity_check:
-            user_bson = yield self.db.users.find_one({'email':login},{'password':0})
-            if user_bson is None:#User already exists
-                logging.info("User not found")
-                temp = yield self.db.users.update({'email':login},{'$set':{platform_id:generic_id}},upsert=True)
-                user_bson = yield self.db.users.find_one({'email':login,platform_id:generic_id},{'password':0,'facebook_id':0,'twitter_id':0,'google_plus_id':0,'time_stamp':0})
-                logging.info("{0}".format(user_bson))
-                if user_bson is not None:#update login_stamp
-                    temp = yield self.db.users.update({'_id':ObjectId(user_bson['_id'])},{'$addToSet':{'login_stamp':datetime.now()}})
-                    logging.info("logging stamp: {0}".format(temp))
-            else:
-                try:
-                    if (user_bson[platform_id] != generic_id):
-                        logging.info("{0},{1}".format(user_bson[platform_id],generic_id))
-                        logging.info("User found but id is not correct")
-                        user_bson = None
-                    else:
-                        logging.info("User found and correctly logged in")
-                        temp = yield self.db.users.update({'_id':ObjectId(user_bson['_id'])},{'$addToSet':{'login_stamp':datetime.now()}})
-                        logging.info("logging stamp: {0}".format(temp))
-                except KeyError:
-                    logging.info("Key not found")
-                    temp = yield self.db.users.update({'email':login},{'$set':{platform_id:generic_id}},upsert=True)
-                    user_bson = yield self.db.users.find_one({'email':login,platform_id:generic_id},{'password':0,'facebook_id':0,'twitter_id':0,'google_plus_id':0,'time_stamp':0})
-                    logging.info("{0}".format(user_bson))
-                    if user_bson is not None:#update login_stamp
-                        temp = yield self.db.users.update({'_id':ObjectId(user_bson['_id'])},{'$addToSet':{'login_stamp':datetime.now()}})
-                        logging.info("logging stamp: {0}".format(temp))
-        else:
-            user_bson = None
         raise Return(user_bson)
 
     @coroutine

@@ -27,7 +27,7 @@ class User(BaseHandler):
         email = self.get_argument('email')#Email, user-id for login
         password = self.get_argument('password')#Password
         facebook_id = self.get_argument('facebook_id', None)#Facebook id input
-        birthday = self.get_argument('birthday')
+        birthday = self.get_argument('birthday',None)
         genre = self.get_argument('genre',None)
         telephone = self.get_argument('telephone',None)
         if telephone is not None:
@@ -48,7 +48,7 @@ class User(BaseHandler):
         email = self.get_argument('email',None)#Email
         password = self.get_arguments('password',None)#User password.
         facebook_id = self.get_argument('facebook_id',None)#Facebook id
-        birthday = self.get_argument('birthday')
+        birthday = self.get_argument('birthday',None)
         user_status = self.get_argument('user_status',None)
         telephone = self.get_argument('telephone',None)
         response = yield self.settings['model'].modifyUser(idUser,name,email,password,facebook_id,birthday,user_status,telephone)
