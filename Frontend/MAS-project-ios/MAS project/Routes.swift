@@ -9,12 +9,8 @@
 import UIKit
 import MapKit
 
-class Routes: UIViewController, GMSMapViewDelegate, CLLocationManagerDelegate{ // last get current location
-    
-    //    struct myvar {
-    //        var t : Int = 1
-    //    }
-    
+class Routes: UIViewController, GMSMapViewDelegate, CLLocationManagerDelegate{
+ 
     /* Globals: */
     var mapView : GMSMapView!
     var polylineSet : Array<GMSPolyline> = Array<GMSPolyline>()
@@ -89,15 +85,9 @@ class Routes: UIViewController, GMSMapViewDelegate, CLLocationManagerDelegate{ /
             var destStr : NSString = destURL.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
             var destGeoURL : NSURL = NSURL(string: destStr as String)!
             
-            
-//            println("outter most")
             let geocoderTask = NSURLSession.sharedSession().dataTaskWithURL(destGeoURL) {(dataGeo, response, error) in
-                //                println(NSString(data: dataGeo, encoding: NSUTF8StringEncoding))
-                // main thread:
-                //                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-//                println("in dest")
+
                 var geoReply = JSON(data: dataGeo)
-                //                    println(geoReply)
                 var results = geoReply["results"].array!
 
                 destCoord = CLLocationCoordinate2DMake(results[0]["geometry"]["location"]["lat"].double!, results[0]["geometry"]["location"]["lng"].double!)
@@ -132,7 +122,7 @@ class Routes: UIViewController, GMSMapViewDelegate, CLLocationManagerDelegate{ /
                     /* Return to main thread so we can make call to Google Map SDK */
                     dispatch_sync(dispatch_get_main_queue(), { () -> Void in
                         var seeif = 1
-                        //                    println("from outside:\(self.destLat)")
+
                         let json = JSON(data: data) // put data not the encoded one
                         let routesList : Array = json["response"]["routes"].array!
                         let routeScore : Array = json["response"]["score"].array!
@@ -174,7 +164,6 @@ class Routes: UIViewController, GMSMapViewDelegate, CLLocationManagerDelegate{ /
                             
                             var route_string = ""
                             if let route_id = routeIndex[i].number {
-//                                self.indices.append(routeIndex[i].string!)
                                 self.indices.append(route_id.description);
                                 route_string = route_id.description;
                             }
@@ -327,9 +316,7 @@ class Routes: UIViewController, GMSMapViewDelegate, CLLocationManagerDelegate{ /
                     }
                 }
             }
-//            println("bestCandidate:\(bestCandidate)")
-//            println("bestInd:\(bestInd)")
-        
+
             if candidates.count==0{
                 self.pathPicked = bestInd
             }
@@ -347,13 +334,9 @@ class Routes: UIViewController, GMSMapViewDelegate, CLLocationManagerDelegate{ /
                     self.polylineSet[i].spans = [GMSStyleSpan(color: UIColor.grayColor())]
                 }
             }
-            self.polylineSet[self.pathPicked].spans = [GMSStyleSpan(color: UIColor.greenColor())]
-        
-    
-        
+            self.polylineSet[self.pathPicked].spans = [GMSStyleSpan(color: UIColor.greenColor())]     
             self.label.text = "Score: " + self.scores[self.pathPicked].description;
-        
-//            println("pathPicked:\(self.pathPicked)")
+
 
     }
     

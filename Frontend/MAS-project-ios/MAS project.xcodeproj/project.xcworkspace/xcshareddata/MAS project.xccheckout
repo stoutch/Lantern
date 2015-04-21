@@ -10,6 +10,8 @@
 	<string>MAS project</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
+		<key>569256E33BFFABE0D535D01B9A3BB20D619D6901</key>
+		<string>https://github.com/quique7991/MAS.git</string>
 		<key>EB36781D7E3F98E58DBE66B116E93D6655B0FA74</key>
 		<string>https://github.com/deeptikochar/lantern.git</string>
 	</dict>
@@ -17,6 +19,8 @@
 	<string>MAS project.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
+		<key>569256E33BFFABE0D535D01B9A3BB20D619D6901</key>
+		<string>../../../..</string>
 		<key>EB36781D7E3F98E58DBE66B116E93D6655B0FA74</key>
 		<string>../..</string>
 	</dict>
@@ -28,6 +32,14 @@
 	<string>EB36781D7E3F98E58DBE66B116E93D6655B0FA74</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>569256E33BFFABE0D535D01B9A3BB20D619D6901</string>
+			<key>IDESourceControlWCCName</key>
+			<string>..</string>
+		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
