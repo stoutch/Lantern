@@ -4,17 +4,17 @@ Lantern is an app for safety by social navigation. Working on a project late at 
 
 Lantern uses user anonymized location data and user reports to find the safest route home!
 
-##Screenshots
+## Screenshots
 
-###Login
+### Login
 
 <img src="https://github.com/stoutch/Lantern/blob/readme/Screenshot_2015-04-20-15-57-54.png" height=300>
 
-###Home
+### Home
 
 <img src="https://github.com/stoutch/Lantern/blob/readme/Screenshot_2015-04-20-15-58-01.png" height=300>
 
-###Submit Rating
+### Submit Rating
 
 <img src="https://github.com/stoutch/Lantern/blob/readme/Screenshot_2015-04-10-16-53-58.png" height=300>
 
